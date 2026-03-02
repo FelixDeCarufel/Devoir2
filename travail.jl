@@ -18,20 +18,31 @@
 
 # # Introduction
 
-# Le texte de votre introduction va ici.
-
 # Vous pouvez utiliser la syntaxe suivante pour l'_italique_, le **gras**, et
 # les caractères `monospace`.
 
-# L'introduction doit avoir les sections suivantes:
-
 # ## Mise en contexte
 
-# Décrivez de manière sommaire la situation biologique
+# On utilise le concept de succession écologique pour décrire le cycle des espèces présentes sur un territoire suite à une perturbation, qu'elle soit naturelle ou 
+# anthropologique. La succession peut être primaire, lorsque la perturbation détruit ou rend indisponible toutes formes de sol, ou secondaire, lorsque la perturbation
+# enlève toutes formes de végétaux mais que le sol reste accessible. Lors de succession secondaire, les espèces végétales qui se succèdent chronologiquement sont
+# généralement des herbacées, des arbustes puis des arbres tout en ayant des espèces des stades de succession précédent (Ury et al., 2025). 
+
+# Lors de l'aménagement de lignes électriques à haute tension, la présence élevée d'arbres, qui pouvent atteindre de plus grandes hauteurs que les herbacées et arbustes,
+# est en enjeux pour la sécurité des infrastructures. L'intervention humaine afin de sélectionner certaines espèces et leur abondance devient alors nécessaire afin 
+# qu'elles ne posent pas de problèmes aux infrastructures lorsque la communauté végétale atteint l'équilibre. De plus, un nombre minimale d'espèce devrait être considérée
+# afin de négliger les impacts des modifications anthropologiques sur la biodiversité. Trejo-Pérez et ses collègues (2023) ont prouvés qu'une grande sélection d'espèces
+# herbacées avait non seulement un impact positif sur la biodiversité, mais que cela permettait aussi de contrer l'établissement d'arbres plus efficacement.
+
+
+# ajouter les sources dans la bibliographie : ISBN: 9780135188743 et DOI: 10.1111/avsc.12781
 
 # ## Question
 
-# Introduisez la question que vous allez aborder avec le modèle
+# Si ont devait choisir une espèce herbacée et 2 espèces de buissons afin d'aménager un corridor de 200 parcelles sous une ligne à haute tension, lesquels devrait-ont 
+# choisir (en se fiant à leur matrice de transition) et à quel ratio devrait-elles être plantées pour que 20% des parcelles soient végétalisées, et que parmi ces 20%, 
+# 30% soient des herbes, et 70% soient des buissons tout en s'assurant que la variété de buisson la moins abondante ne représente pas moins de 30% du total des parcelles 
+# occupées par des buissons?
 # ## Hypothèse et résultats attendus
 
 # Clarifiez vos attentes par rapport au résultat de la simulation
@@ -40,6 +51,11 @@
 
 # En utilisant autant de sous-sections que nécessaire, expliquez le modèle, ses
 # suppositions, et les décisions principales
+
+# Notre modèle suppose que les seuls facteurs qui impactent la composition d'espèces dans notre corridor à la génération "t" est la composition
+# en espèce au temps "t-1" et leur matrice de transition. On simule donc un environnement fermé dans lequel aucune autre semence ne peut 
+# provenir de l'extérieur. De plus, on assume que le taux d'apparition et de mortalité des espèces présentes est constant de générations en 
+# générations. 
 
 # On commence une sous-section avec # ## Titre
 # # Code pour le modèle

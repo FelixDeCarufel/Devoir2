@@ -6,10 +6,10 @@
 #      prenom: Félix
 #      matricule: 20275312
 #      github: FelixDeCarufel
-#    - nom: Auteur
-#      prenom: Deuxième
-#      matricule: XXXXXXXX
-#      github: DeuxiAut
+#    - nom: Moreau
+#      prenom: Maxim
+#      matricule: 20269875
+#      github: Max80780
 #    - nom: Auteur
 #      prenom: Troisième
 #      matricule: XXXXXXXX
@@ -28,9 +28,9 @@
 # enlève toutes formes de végétaux mais que le sol reste accessible. Lors de succession secondaire, les espèces végétales qui se succèdent chronologiquement sont
 # généralement des herbacées, des arbustes puis des arbres tout en ayant des espèces des stades de succession précédent (Ury et al., 2025). 
 
-# Lors de l'aménagement de lignes électriques à haute tension, la présence élevée d'arbres, qui pouvent atteindre de plus grandes hauteurs que les herbacées et arbustes,
-# est en enjeux pour la sécurité des infrastructures. L'intervention humaine afin de sélectionner certaines espèces et leur abondance devient alors nécessaire afin 
-# qu'elles ne posent pas de problèmes aux infrastructures lorsque la communauté végétale atteint l'équilibre. De plus, un nombre minimale d'espèce devrait être considérée
+# Lors de l'aménagement de lignes électriques à haute tension, la présence élevée d'arbres, qui peuvent atteindre de plus grandes hauteurs que les herbacées et arbustes,
+# est un enjeu pour la sécurité des infrastructures. L'intervention humaine afin de sélectionner certaines espèces et leur abondance devient alors nécessaire afin 
+# qu'elles ne posent pas de problème aux infrastructures lorsque la communauté végétale atteint l'équilibre. De plus, un nombre minimale d'espèce devrait être considérée
 # afin de négliger les impacts des modifications anthropologiques sur la biodiversité. Trejo-Pérez et ses collègues (2023) ont prouvés qu'une grande sélection d'espèces
 # herbacées avait non seulement un impact positif sur la biodiversité, mais que cela permettait aussi de contrer l'établissement d'arbres plus efficacement.
 
@@ -39,10 +39,11 @@
 
 # ## Question
 
-# Si ont devait choisir une espèce herbacée et 2 espèces de buissons afin d'aménager un corridor de 200 parcelles sous une ligne à haute tension, lesquels devrait-ont 
-# choisir (en se fiant à leur matrice de transition) et à quel ratio devrait-elles être plantées pour que 20% des parcelles soient végétalisées, et que parmi ces 20%, 
-# 30% soient des herbes, et 70% soient des buissons tout en s'assurant que la variété de buisson la moins abondante ne représente pas moins de 30% du total des parcelles 
+# Si on devait choisir une espèce d'herbacée et 2 espèces de buissons afin d'aménager un corridor de 200 parcelles sous une ligne à haute tension, lesquelles devraient-on 
+# choisir (en se fiant à leur matrice de transition) et à quel ratio devraient-elles être plantées pour que 20% des parcelles soient végétalisées, et que, parmi ces 20%, 
+# 30% soient des herbes et 70% soient des buissons tout en s'assurant que la variété de buisson la moins abondante ne représente pas moins de 30% du total des parcelles 
 # occupées par des buissons?
+
 # ## Hypothèse et résultats attendus
 
 # Clarifiez vos attentes par rapport au résultat de la simulation

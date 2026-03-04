@@ -127,20 +127,20 @@ function simulation(transitions, states; generations=500, stochastic=false)
 end
 
 # States
-# Barren, Grass, Shrubs
-s = [100, 0, 0]
+# Barren, Grass, Shrubs1, Shrubs2
+s = [100, 0, 0, 0]
 states = length(s)
 patches = sum(s)
 
 # Transitions
 T = zeros(Float64, states, states)
-T[1, :] = [110, 8, 0]
-T[2, :] = [2, 120, 3]
-T[3, :] = [1, 0, 94]
-T
+T[1, :] = [110, 8, 0, 2]
+T[2, :] = [2, 120, 3, 4]
+T[3, :] = [1, 0, 94, 12]
+T[4, :] = [12, 0, 4, 15]
 
-states_names = ["Barren", "Grasses", "Shrubs"]
-states_colors = [:grey40, :orange, :teal]
+states_names = ["Barren", "Grasses", "Shrubs1", "Shrubs2"]
+states_colors = [:grey40, :orange, :teal, :blue]
 
 # # Présentation des résultats
 

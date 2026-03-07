@@ -57,8 +57,9 @@
 # en espèce au temps "t-1" et leur matrice de transition. On simule donc un environnement fermé dans lequel aucune autre semence ne peut 
 # provenir de l'extérieur. De plus, on assume que le taux d'apparition et de mortalité des espèces présentes est constant de générations en 
 # générations. 
-# Le modèle utilisé est celui d'un modèle stochastique/déterministe de Markov dans lequel chacune des parcelles peut passer d'un état à un autre selon une matrice de transition
-# qui elle reste fixe dans le temps. Alors, les probabilités de transition sont constantes et ne dépendent pas de la position spatiale des parcelles ainsi que de la composition du voisinage des parcelles.
+# Le modèle utilisé est un modèle stochastique/déterministe de Markov dans lequel chacune des parcelles peut passer d'un état à un autre selon une matrice de transition
+# qui elle reste fixe dans le temps. Alors, les probabilités de transition sont constantes et ne dépendent pas de la position spatiale des parcelles ainsi que de la 
+# composition du voisinage des parcelles.
 
 # On commence une sous-section avec # ## Titre
 # # Code pour le modèle
@@ -75,9 +76,10 @@ using Distributions
 
 import Random
 Random.seed!(2045)
-# ## Fonction vérifiant que chaque ligne de la matrice de transition correspond à des probabilités.
-# La somme des probabilités sur la ligne de matrice de transition doient être égale à 1 pour que toutes les transitions possibles soient bien représentées. Si ce n'est pas le cas,
-# la fonction normalise automatiquement les valeurs.
+# ## Fonction check_tansition_matrix
+
+# Fonction vérifiant que chaque ligne de la matrice de transition correspond à des probabilités. La somme des probabilités sur la ligne de matrice de transition doient 
+# être égale à 1 pour que toutes les parcelles soient dans un état quelconque au temps t+1. Si ce n'est pas le cas, la fonction normalise automatiquement les valeurs.
 
 function check_transition_matrix!(T)
     for ligne in axes(T, 1)
@@ -88,6 +90,11 @@ function check_transition_matrix!(T)
     end
     return T
 end
+
+# ## Fonction check_function_arguments
+
+# Cette fonction vérifie que la matrice de transition est bien carrée et que le nombre d’états correspond à la taille de la matrice. Cela permet donc d'éviter des
+# incohérences entre les états possibles et leur matrice de transition. 
 
 function check_function_arguments(transitions, states)
     if size(transitions, 1) != size(transitions, 2)
@@ -100,17 +107,69 @@ function check_function_arguments(transitions, states)
     return nothing
 end
 
+# ## Fonction _sim_stochastic
+
+# Cette fonction simule le tout de façon stochastique. Pour toutes les parcelles, elle va répartir de façon aléatoire celles-ci vers les états possibles de la génération suivante.
+# Tout cela selon les probabilités de la matrice de transition. Donc, elle représente donc le caractère aléatoire de la succession écologique simuler ici de façon stochastique.
+
+# À partir d'ici les commentaires c'est pour nous on les enlèvera à la fin mais ça nous permet de comprendre le tout:
+
+# timeseries : le tableau qui contient le nombre de parcelles dans chaque état au fil du temps
+# transitions : la matrice de transition
+# generation : la génération qu’on est en train de simuler
+# boucle passe à travers chaque état possible du système
+
 function _sim_stochastic!(timeseries, transitions, generation)
     for state in axes(timeseries, 1)
-        pop_change = rand(Multinomial(timeseries[state, generation], transitions[state, :]))
+        pop_change = rand(Multinomial(timeseries[state, generation], transitions[state, :])) 
+
+        # fait un tirage aléatoire pour savoir comment les parcelles de l’état actuel vont se répartir à la génération suivante.
+        # timeseries[state, generation] = combien de parcelles sont dans cet état en ce moment
+        # transitions[state, :] = les probabilités de passer vers chaque état possible
+        # Multinomial(...) = répartit ces parcelles entre les différents états
+        # rand(...) = fait le tirage au hasard
+
         timeseries[:, generation+1] .+= pop_change
+
+        # Cette ligne ajoute le résultat du tirage à la génération suivante.
+    
     end
 end
 
+# ## Fonction _sim_determ
+
+# Cette fonction simule le tout de façon déterministe. Elle calcule directement la composition attendue des états des différentes parcelles selon 
+# l'état de base de celles-ci et la matrice de transition. Donc, à la génération suivante, on va obtenir les états des parcelles en appliquant la matrice de transition. 
+# Elle représente donc une tendance moyenne du système, sans effet du hasard.
+
+# À partir d'ici les commentaires c'est pour nous on les enlèvera à la fin mais ça nous permet de comprendre le tout:
+
 function _sim_determ!(timeseries, transitions, generation)
     pop_change = (timeseries[:, generation]' * transitions)'
+
+    # Cette ligne calcule directement combien de parcelles devraient se retrouver dans chaque état à la prochaine génération.
+    # Ici : timeseries[:, generation] = le vecteur des parcelles actuelles
+    # ' = transpose le vecteur pour permettre la multiplication matricielle
+    # * transitions = applique la matrice de transition
+    # le dernier ' remet le résultat en colonne
+
     timeseries[:, generation+1] .= pop_change
+    
+    # place directement les valeurs calculées dans la génération suivante.
+
 end
+
+# ## Fonction simulation
+
+# Cette fonction va exécuter la simulation complète. Elle va initialiser les états des parcelles, puis appliquer les vérifications nécessaires et finalement simuler
+# l’évolution du corridor sur plusieurs générations. Elle permet donc d’observer comment la composition végétale va changer au fil du temps jusqu’à l'équilibre.
+
+# À partir d'ici les commentaires c'est pour nous on les enlèvera à la fin mais ça nous permet de comprendre le tout:
+
+# transitions → la matrice de transition
+# states → le nombre initial de parcelles dans chaque état
+# generations → le nombre de générations à simuler (500 par défaut)
+# stochastic → permet de choisir une simulation stochastique ou déterministe
 
 function simulation(transitions, states; generations=500, stochastic=false)
 
@@ -118,23 +177,39 @@ function simulation(transitions, states; generations=500, stochastic=false)
     check_function_arguments(transitions, states)
 
     _data_type = stochastic ? Int64 : Float32
+
+    # Cette ligne choisit le type de données utilisé dans la simulation :
+    # Int64 si la simulation est stochastique (on manipule un nombre entier de parcelles)
+    # Float32 si elle est déterministe (on peut avoir des valeurs fractionnaires)
+
     timeseries = zeros(_data_type, length(states), generations + 1)
+
+    # crée une matrice qui va enregistrer l’évolution du nombre de parcelles dans chaque état au fil des générations. lignes → les états et colonnes → les générations.
+
     timeseries[:, 1] = states
 
     _sim_function! = stochastic ? _sim_stochastic! : _sim_determ!
 
-    for generation in Base.OneTo(generations)
+    # Cette ligne choisit quelle fonction utiliser pour la simulation :
+    # _sim_stochastic! si on veut une simulation aléatoire
+    # _sim_determ! si on veut une simulation déterministe
+
+    for generation in Base.OneTo(generations) # Répéter pour chaque génération en gros.
         _sim_function!(timeseries, transitions, generation)
     end
 
-    return timeseries
+    return timeseries # La fonction retourne la matrice timeseries, qui contient l’évolution du nombre de parcelles dans chaque état au fil du temps.
 end
+
+# ## Matrice d'états initales des parcelles selon leurs états
 
 # States
 # Barren, Grass, Shrubs1, Shrubs2
 s = [100, 0, 0, 0]
 states = length(s)
 patches = sum(s)
+
+# ## Matrice de transition
 
 # Transitions
 T = zeros(Float64, states, states)
@@ -143,17 +218,23 @@ T[2, :] = [2, 120, 3, 4]
 T[3, :] = [1, 0, 94, 12]
 T[4, :] = [12, 0, 4, 15]
 
+# ## Les noms des états et leurs couleurs dans le graphique.
+
 states_names = ["Barren", "Grasses", "Shrubs1", "Shrubs2"]
 states_colors = [:grey40, :orange, :teal, :blue]
 
 # # Présentation des résultats
+# ## Figure générée
 
-# Présentez les résultats des simulations, en faisant un lien avec la question initiale.
+# Création de la figure et des axes du graphique. L’axe des x représente le nombre de générations et l’axe des y le nombre de parcelles dans chaque état.
 
 f = Figure()
 ax = Axis(f[1, 1], xlabel="Nb. générations", ylabel="Nb. parcelles")
 
-# Stochastic simulation
+# ## Simulation Stochastique
+
+# Exécutation de la simulation stochastique 100 fois pour voir la variabilité possible de la succession écologique vu le hasard.
+
 for _ in 1:100
     sto_sim = simulation(T, s; stochastic=true, generations=200)
     for i in eachindex(s)
@@ -161,7 +242,11 @@ for _ in 1:100
     end
 end
 
-# Deterministic simulation
+# ## Simulation Deterministe
+
+# Exécutation d'une simulation déterministe pour représenter la trajectoire attendue du système quand les probabilités de transition d'états sont 
+# appliquées sans variabilité aléatoire. Elle est une ligne noire.
+
 det_sim = simulation(T, s; stochastic=false, generations=200)
 for i in eachindex(s)
     lines!(ax, det_sim[i, :], color=states_colors[i], alpha=1, label=states_names[i], linewidth=4)
@@ -170,6 +255,10 @@ end
 axislegend(ax)
 tightlimits!(ax)
 current_figure()
+
+# Présentez les résultats des simulations, en faisant un lien avec la question initiale.
+
+
 # # Discussion
 
 # Concluez sur le résultat, et sur les limitations du modèle.

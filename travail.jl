@@ -57,6 +57,8 @@
 # en espèce au temps "t-1" et leur matrice de transition. On simule donc un environnement fermé dans lequel aucune autre semence ne peut 
 # provenir de l'extérieur. De plus, on assume que le taux d'apparition et de mortalité des espèces présentes est constant de générations en 
 # générations. 
+# Le modèle utilisé est celui d'un modèle stochastique/déterministe de Markov dans lequel chacune des parcelles peut passer d'un état à un autre selon une matrice de transition
+# qui elle reste fixe dans le temps. Alors, les probabilités de transition sont constantes et ne dépendent pas de la position spatiale des parcelles ainsi que de la composition du voisinage des parcelles.
 
 # On commence une sous-section avec # ## Titre
 # # Code pour le modèle
@@ -66,14 +68,16 @@
 # en lui-même, et doit faire des liens entre les choix de programmation et la
 # question biologique.
 
-# ## Packages nécessaires
+# ## Packages nécessaires pour la simulation
 
 using CairoMakie
 using Distributions
 
 import Random
 Random.seed!(2045)
-# ## Une autre section
+# ## Fonction vérifiant que chaque ligne de la matrice de transition correspond à des probabilités.
+# La somme des probabilités sur la ligne de matrice de transition doient être égale à 1 pour que toutes les transitions possibles soient bien représentées. Si ce n'est pas le cas,
+# la fonction normalise automatiquement les valeurs.
 
 function check_transition_matrix!(T)
     for ligne in axes(T, 1)

@@ -203,6 +203,8 @@ end
 
 # ## Matrice d'états initales des parcelles selon leurs états
 
+# On a rajouté un état étant le Shrubs2 pour avoir les 2 types buisson.
+
 # States
 # Barren, Grass, Shrubs1, Shrubs2
 s = [100, 0, 0, 0]

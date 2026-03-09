@@ -102,7 +102,7 @@ function check_function_arguments(transitions, states)
     end
 
     if size(transitions, 1) != length(states)
-        throw("Le nombre d'états ne correspond psa à la matrice de transition")
+        throw("Le nombre d'états ne correspond pas à la matrice de transition")
     end
     return nothing
 end
@@ -210,6 +210,54 @@ end
 s = [100, 0, 0, 0]
 states = length(s)
 patches = sum(s)
+
+
+# On crée une fonction afin de vérfier que le nombre de buissons à l'état initial respecte les conditions imposées.
+
+function verif_nombre_buissons_ini(s)
+
+    # Si jamais le nombre de buissons dépasse 50, on va:
+
+    if (s[3]+s[4]) > 50
+
+            # donner un message d'avertissement
+
+            @warn "Il y avait initialement plus que 50 buissons. Les proportions des nombres donnés furent gardées."
+
+            # et stocker les valeurs qui furent données par l'utilisateur.
+
+            ancienne_valeur3= s[3]
+            ancienne_valeur4= s[4]
+
+            # Par la suite, on change les valeurs, afin qu'elles respectent les conditions, tout en respectant les proportions qui furent données initialement.
+            # Si jamais les nouvelles valeurs donnent des nombres à virgule, on arrondit au nombre le plus proche, puisqu'un buisson et demi n'est pas quelquechose qui est observable dans la réalité.
+
+            s[3]= round(((ancienne_valeur3 * 50) / (ancienne_valeur3+ancienne_valeur4)))
+            s[4]= round(((ancienne_valeur4 * 50) / (ancienne_valeur3+ancienne_valeur4)))
+            return s
+    end
+end
+
+verif_nombre_buissons_ini(s)
+
+# On crée aussi une fonction qui vérifie l'état initial.
+
+function verif_etat_initial(s)
+
+    # Si il y a des parcelles herbacées, on rejette cet état initial.
+
+   if s[2] !=0
+        throw("Il ne faut pas qu'il y a d'herbes à l'état initial")
+    end
+
+    # Si il y a plus ou moins de 200 parcelles, on rejette aussi cet état initial.
+
+    if sum(s) != 200
+        throw("Il n'y a pas 200 parcelles.")
+    end
+    return nothing
+end
+
 
 # ## Matrice de transition
 

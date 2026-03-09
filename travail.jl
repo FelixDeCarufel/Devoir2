@@ -304,17 +304,18 @@ end
 
 # ## Automatisation de la simulation
 
-function simulation_automatique(timeseries, transitions, generation)
+function simulation_automatique(transitions, states)
     test_buisson = (0,50,5)
-    # test_matrice = 
+    test_matrice = (0,1,0.25)
     for s[3] in test_buisson
-       det_sim = simulation(T, s; stochastic=false, generations=200)
+        for T[3, 4] in test_matrice
+            simulation(transitions, states; generations=500, stochastic=false)
+        end
     end
-
 # conditions demandées à la fin
-#    if  0.18 <= sum(s[2:4])/nb_parcelle <= 0.22 & 0.28 <= s[2]/patches <= 0.32 & 0.68 <= sum(s[3:4])/patches <= 0.72 & min(s[3], s[4])/sum(s[3], s[4]) >= 0.3
-#    return l'état initial de la population
-#    return matrice de transition
+#   if  0.18 <= sum(s[2:4])/nb_parcelle <= 0.22 & 0.28 <= s[2]/patches <= 0.32 & 0.68 <= sum(s[3:4])/patches <= 0.72 & min(s[3], s[4])/sum(s[3], s[4]) >= 0.3
+#       return l'état initial de la population
+#       return matrice de transition
 #    return figure()
 end
    

@@ -281,7 +281,7 @@ states_colors = [:grey40, :orange, :teal, :blue]
 f = Figure()
 ax = Axis(f[1, 1], xlabel="Nb. générations", ylabel="Nb. parcelles")
 
-# ## Simulation Stochastique
+ # ## Simulation Stochastique
 
 # Exécutation de la simulation stochastique 100 fois pour voir la variabilité possible de la succession écologique vu le hasard.
 
@@ -302,12 +302,27 @@ for i in eachindex(s)
     lines!(ax, det_sim[i, :], color=states_colors[i], alpha=1, label=states_names[i], linewidth=4)
 end
 
+# ## Automatisation de la simulation
+
+function simulation_automatique(timeseries, transitions, generation)
+    test_buisson = (0,50,5)
+    # test_matrice = 
+    for s[3] in test_buisson
+       det_sim = simulation(T, s; stochastic=false, generations=200)
+    end
+
+# conditions demandées à la fin
+#    if  0.18 <= sum(s[2:4])/nb_parcelle <= 0.22 & 0.28 <= s[2]/patches <= 0.32 & 0.68 <= sum(s[3:4])/patches <= 0.72 & min(s[3], s[4])/sum(s[3], s[4]) >= 0.3
+#    return l'état initial de la population
+#    return matrice de transition
+#    return figure()
+end
+   
+# ## Présentez les résultats des simulations, en faisant un lien avec la question initiale.
+
 axislegend(ax)
 tightlimits!(ax)
 current_figure()
-
-# Présentez les résultats des simulations, en faisant un lien avec la question initiale.
-
 
 # # Discussion
 

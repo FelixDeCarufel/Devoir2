@@ -230,10 +230,19 @@ function verif_nombre_buissons_ini(s)
             ancienne_valeur4= s[4]
 
             # Par la suite, on change les valeurs, afin qu'elles respectent les conditions, tout en respectant les proportions qui furent données initialement.
-            # Si jamais les nouvelles valeurs donnent des nombres à virgule, on arrondit au nombre le plus proche, puisqu'un buisson et demi n'est pas quelquechose qui est observable dans la réalité.
+            # Si jamais les nouvelles valeurs donnent des nombres à virgule, on arrondit au nombre le plus bas, puisqu'un buisson et demi n'est pas quelquechose qui est observable dans la réalité.
 
-            s[3]= round(((ancienne_valeur3 * 50) / (ancienne_valeur3+ancienne_valeur4)))
-            s[4]= round(((ancienne_valeur4 * 50) / (ancienne_valeur3+ancienne_valeur4)))
+            s[3]= floor(((ancienne_valeur3 * 50) / (ancienne_valeur3+ancienne_valeur4)))
+            s[4]= floor(((ancienne_valeur4 * 50) / (ancienne_valeur3+ancienne_valeur4)))
+
+            # Dans le cas où les nouvelles proportions, à cause de l'approximation, donnent 49 au lieu de 50, on rajoute une parcelle vide afin qu'il y ait 200 parcelles en tout.
+
+            if (s[3]+s[4]) == 49
+                s[1]= s[1]+1
+            end
+
+            # On retourne le nouvel état initial.
+
             return s
     end
 end

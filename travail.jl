@@ -292,9 +292,10 @@ for _ in 1:100
     end
 end
 
+# conditions demandées à la fin pour la stochastique
 # ## Simulation Deterministe
 
-# Exécutation d'une simulation déterministe pour représenter la trajectoire attendue du système quand les probabilités de transition d'états sont 
+# Exécution d'une simulation déterministe pour représenter la trajectoire attendue du système quand les probabilités de transition d'états sont 
 # appliquées sans variabilité aléatoire. Elle est une ligne noire.
 
 det_sim = simulation(T, s; stochastic=false, generations=200)
@@ -302,23 +303,15 @@ for i in eachindex(s)
     lines!(ax, det_sim[i, :], color=states_colors[i], alpha=1, label=states_names[i], linewidth=4)
 end
 
-# ## Automatisation de la simulation
+# conditions demandées à la fin pour la déterministe
+if  0.18 <= sum(s[2:4])/nb_parcelle <= 0.22 & 0.28 <= s[2]/patches <= 0.32 & 0.68 <= sum(s[3:4])/patches <= 0.72 & min(s[3], s[4])/sum(s[3], s[4]) >= 0.3
+    return S 
+    return T
+    return current_figure()
+else
+    print("Les conditions ne sont pas respectées")
+end 
 
-function simulation_automatique(transitions, states)
-    test_buisson = (0,50,5)
-    test_matrice = (0,1,0.25)
-    for s[3] in test_buisson
-        for T[3, 4] in test_matrice
-            simulation(transitions, states; generations=500, stochastic=false)
-        end
-    end
-# conditions demandées à la fin
-#   if  0.18 <= sum(s[2:4])/nb_parcelle <= 0.22 & 0.28 <= s[2]/patches <= 0.32 & 0.68 <= sum(s[3:4])/patches <= 0.72 & min(s[3], s[4])/sum(s[3], s[4]) >= 0.3
-#       return l'état initial de la population
-#       return matrice de transition
-#    return figure()
-end
-   
 # ## Présentez les résultats des simulations, en faisant un lien avec la question initiale.
 
 axislegend(ax)

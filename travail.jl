@@ -30,8 +30,8 @@
 
 # Lors de l'aménagement de lignes électriques à haute tension, la présence élevée d'arbres, qui peuvent atteindre de plus grandes hauteurs que les herbacées et arbustes,
 # est un enjeu pour la sécurité des infrastructures. L'intervention humaine afin de sélectionner certaines espèces et leur abondance devient alors nécessaire afin 
-# qu'elles ne posent pas de problème aux infrastructures lorsque la communauté végétale atteint l'équilibre. De plus, un nombre minimale d'espèce devrait être considérée
-# afin de négliger les impacts des modifications anthropologiques sur la biodiversité. Trejo-Pérez et ses collègues (2023) ont prouvés qu'une grande sélection d'espèces
+# qu'elles ne posent pas de problème aux infrastructures lorsque la communauté végétale atteint l'équilibre. De plus, un nombre minimal d'espèces devrait être considéré
+# afin de négliger les impacts des modifications anthropologiques sur la biodiversité. Trejo-Pérez et ses collègues (2023) ont prouvé qu'une grande sélection d'espèces
 # herbacées avait non seulement un impact positif sur la biodiversité, mais que cela permettait aussi de contrer l'établissement d'arbres plus efficacement.
 
 
@@ -47,6 +47,7 @@
 # ## Hypothèse et résultats attendus
 
 # Clarifiez vos attentes par rapport au résultat de la simulation
+# L'hypothèse stipule que 
 
 # # Description du modèle
 
@@ -207,7 +208,7 @@ end
 
 # States
 # Barren, Grass, Shrubs1, Shrubs2
-s = [100, 0, 0, 0]
+s = [340, 90, 100, 45]
 states = length(s)
 patches = sum(s)
 
@@ -256,16 +257,28 @@ function verif_etat_initial(s)
     # Si il y a des parcelles herbacées, on rejette cet état initial.
 
    if s[2] !=0
-        throw("Il ne faut pas qu'il y a d'herbes à l'état initial")
+        @warn"Il ne faut pas qu'il y a d'herbes à l'état initial. Les herbes furent supprimées."
+        s[2]=0
     end
 
     # Si il y a plus ou moins de 200 parcelles, on rejette aussi cet état initial.
 
     if sum(s) != 200
-        throw("Il n'y a pas 200 parcelles.")
+        @warn("Il n'y a pas 200 parcelles.")
+        ancienne_valeur1=s[1]
+        ancienne_valeur3= s[3]
+        ancienne_valeur4= s[4]
+        s[1]= floor(((ancienne_valeur1 * 200) / (ancienne_valeur3+ancienne_valeur4+ancienne_valeur1)))
+        s[3]= floor(((ancienne_valeur3 * 200) / (ancienne_valeur3+ancienne_valeur4+ancienne_valeur1)))
+        s[4]= floor(((ancienne_valeur4 * 200) / (ancienne_valeur3+ancienne_valeur4+ancienne_valeur1)))
+        if sum(s)== 199
+            s[1]=s[1]+1
+        end
     end
-    return nothing
+    return s
 end
+
+verif_etat_initial(s)
 
 
 # ## Matrice de transition

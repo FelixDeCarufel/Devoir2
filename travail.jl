@@ -437,15 +437,15 @@ function _sim_stochastic!(timeseries, transitions, generation)
     for state in axes(timeseries, 1)
         pop_change = rand(Multinomial(timeseries[state, generation], transitions[state, :])) 
 
-        # fait un tirage aléatoire pour savoir comment les parcelles de l’état actuel vont se répartir à la génération suivante.
-        # timeseries[state, generation] = combien de parcelles sont dans cet état en ce moment
-        # transitions[state, :] = les probabilités de passer vers chaque état possible
-        # Multinomial(...) = répartit ces parcelles entre les différents états
-        # rand(...) = fait le tirage au hasard
+# fait un tirage aléatoire pour savoir comment les parcelles de l’état actuel vont se répartir à la génération suivante.
+# timeseries[state, generation] = combien de parcelles sont dans cet état en ce moment
+# transitions[state, :] = les probabilités de passer vers chaque état possible
+# Multinomial(...) = répartit ces parcelles entre les différents états
+# rand(...) = fait le tirage au hasard
 
         timeseries[:, generation+1] .+= pop_change
 
-        # Cette ligne ajoute le résultat du tirage à la génération suivante.
+# Cette ligne ajoute le résultat du tirage à la génération suivante.
     
     end
 end
@@ -480,14 +480,6 @@ function simulation(transitions, states; generations=500, stochastic=false)
     end
 
    return timeseries # La fonction retourne la matrice timeseries, qui contient l’évolution du nombre de parcelles dans chaque état au fil du temps.
-    return sum(s[2:4])/patches
-end
-
-det_sim = simulation(T, s; stochastic=false, generations=200)
-if  sum(s[2:4])/patches <= 0.22 && 0.28 <= s[2]/patches <= 0.32 && 0.68 <= sum(s[3:4])/patches <= 0.72 && min(s[3], s[4])/sum(s[3], s[4]) >= 0.3
-    print("Les conditions ne sont pas respectées")
-else
-    print("Il faudrait afficher S, T et la figure")
 end
 
 for _ in 1:100
@@ -495,6 +487,13 @@ for _ in 1:100
     for i in eachindex(s)
         lines!(ax, sto_sim[i, :], color=states_colors[i], alpha=0.1)
     end
+end
+
+det_sim = simulation(T, s; stochastic=false, generations=200)
+if  sum(s[2:4])/patches <= 0.22 && 0.28 <= s[2]/patches <= 0.32 && 0.68 <= sum(s[3:4])/patches <= 0.72 && min(s[3], s[4])/sum(s[3], s[4]) >= 0.3
+    print("Les conditions ne sont pas respectées")
+else
+    print("Il faudrait afficher S, T et la figure")
 end
 # ## Présentez les résultats des simulations, en faisant un lien avec la question initiale.
 

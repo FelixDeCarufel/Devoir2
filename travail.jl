@@ -303,7 +303,7 @@ states_colors = [:grey40, :orange, :teal, :blue]
 f = Figure()
 ax = Axis(f[1, 1], xlabel="Nb. générations", ylabel="Nb. parcelles")
 
-# ## Simulation Stochastique
+ # ## Simulation Stochastique
 
 # Exécutation de la simulation stochastique 100 fois pour voir la variabilité possible de la succession écologique vu le hasard.
 
@@ -314,9 +314,10 @@ for _ in 1:100
     end
 end
 
+# conditions demandées à la fin pour la stochastique
 # ## Simulation Deterministe
 
-# Exécutation d'une simulation déterministe pour représenter la trajectoire attendue du système quand les probabilités de transition d'états sont 
+# Exécution d'une simulation déterministe pour représenter la trajectoire attendue du système quand les probabilités de transition d'états sont 
 # appliquées sans variabilité aléatoire. Elle est une ligne noire.
 
 det_sim = simulation(T, s; stochastic=false, generations=200)
@@ -324,12 +325,20 @@ for i in eachindex(s)
     lines!(ax, det_sim[i, :], color=states_colors[i], alpha=1, label=states_names[i], linewidth=4)
 end
 
+# conditions demandées à la fin pour la déterministe
+if  0.18 <= sum(s[2:4])/nb_parcelle <= 0.22 & 0.28 <= s[2]/patches <= 0.32 & 0.68 <= sum(s[3:4])/patches <= 0.72 & min(s[3], s[4])/sum(s[3], s[4]) >= 0.3
+    return S 
+    return T
+    return current_figure()
+else
+    print("Les conditions ne sont pas respectées")
+end 
+
+# ## Présentez les résultats des simulations, en faisant un lien avec la question initiale.
+
 axislegend(ax)
 tightlimits!(ax)
 current_figure()
-
-# Présentez les résultats des simulations, en faisant un lien avec la question initiale.
-
 
 # # Discussion
 
@@ -339,3 +348,5 @@ current_figure()
 # On peut aussi citer des références dans le document `references.bib`,
 # @ermentrout1993cellular -- la bibliographie sera ajoutée automatiquement à la
 # fin du document.
+
+

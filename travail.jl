@@ -373,7 +373,7 @@ simulations, la fonction retourne une figure de l'évolution des parcelles dans 
 ne sont pas respectées, le score des simulations stochastiques est fourni.
 
 transitions : La matrice de transition
-states : Le nombre d'état possible dans la simulation
+states : Vecteur d'état initial
 generation : Nombre de générations à simuler (199 par défaut)
 iteration : Le nombre de simulations stochastiques qui sont générées
 seuil : proportions des simulations stochastiques qui doivent répondre au critères pour qu'on considère que ça fonctionne
@@ -398,9 +398,9 @@ function conditions(transitions, states; gen = 199, iteration = 100, seuil = 0.8
             lines!(ax, sto_sim[j, :], color=states_colors[j], alpha=0.1)
         end
 
-        final_sto = sto[:, end, i]
-        veg_sto = sum(final_sto[2:4])
-        shrubs_sto = sum(final_sto[3:4])
+        final_sto = sto[:, end, i] # état a la dernière génération de la simulation i
+        veg_sto = sum(final_sto[2:4]) # nbr total de parcelles végétalisées
+        shrubs_sto = sum(final_sto[3:4]) # nbr total de parcelles buissons
 
         if 0.18 <= veg_sto / patches <= 0.22 && 0.28 <= final_sto[2] / veg_sto <= 0.32 && 0.68 <= shrubs_sto / veg_sto <= 0.72 && min(final_sto[3], final_sto[4]) / shrubs_sto >= 0.3
             condition_sto += 1
@@ -415,7 +415,7 @@ function conditions(transitions, states; gen = 199, iteration = 100, seuil = 0.8
         lines!(ax, det_sim[i, :], color=states_colors[i], alpha=1, label=states_names[i], linewidth=4)  # on ne peut pas générer le graph avec les stochastiques seulement, car il faut définir les labels, ce qu'on fait juste avec la déterministe
     end
 
-    final_det = det_sim[:, end]
+    final_det = det_sim[:, end] 
     veg_det = sum(final_det[2:4])
     shrubs_det = sum(final_det[3:4])
 

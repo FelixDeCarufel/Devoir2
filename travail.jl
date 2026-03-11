@@ -102,16 +102,16 @@ Random.seed!(2045)
 
 # Vecteur d'états initales des parcelles selon leurs états. On a rajouté un état étant le Shrubs2 pour avoir les 2 types buisson.
 
-s = [340, 90, 100, 45]
+s = [150, 0, 25, 25]
 states = length(s)
 patches = sum(s)
 
 # Matrice de probabilités de transition d'un état à l'autre.
 
 T = zeros(Float64, states, states)
-T[1, :] = [110, 8, 0, 2]
-T[2, :] = [2, 120, 3, 4]
-T[3, :] = [1, 0, 94, 12]
+T[1, :] = [110, 8, 0, 2] 
+T[2, :] = [2, 120, 3, 4] 
+T[3, :] = [1, 0, 94, 12] 
 T[4, :] = [12, 0, 4, 15]
 
 # ## Fonction check_tansition_matrix
@@ -321,8 +321,8 @@ function simulation(transitions, states; generations=500, stochastic=false)
 
     check_transition_matrix!(transitions)
     check_function_arguments(transitions, states)
-    verif_etat_initial(s)
-    verif_nombre_buissons_ini(s)
+    verif_etat_initial(states)
+    verif_nombre_buissons_ini(states)
 
     _data_type = stochastic ? Int64 : Float32
 
@@ -385,7 +385,7 @@ function conditions(transitions, states; gen = 199, iteration = 100, seuil = 0.8
     
     # ## Vérifier les conditions avec une simulation stochastique
 
-    sto = zeros(Float64, length(s), gen+1, iteration)   # "+1" parce que "_sim_stochastic!" utilise generation+1 pour affecter les valeurs des générations dans timeseries
+    sto = zeros(Float64, length(states), gen+1, iteration)   # "+1" parce que "_sim_stochastic!" utilise generation+1 pour affecter les valeurs des générations dans timeseries
     condition_sto = 0   # Indicateur du nombre de simulations stochastiques qui respectent les conditions
 
     # Réalisation des simulations stochastiques en vérifiant et notant si chaque itération correspond aux critères
@@ -394,25 +394,34 @@ function conditions(transitions, states; gen = 199, iteration = 100, seuil = 0.8
         sto_sim = simulation(transitions, states; stochastic=true, generations=gen)
         sto[:, :, i] = sto_sim
 
-        for j in eachindex(s)
+        for j in eachindex(states)
             lines!(ax, sto_sim[j, :], color=states_colors[j], alpha=0.1)
         end
 
-        if sum(sto[2:4, 200, i])./patches <= 0.22 && 0.28 <= sto[2, 200, i]./patches <= 0.32 && 0.68 <= sum(sto[3:4, :, i])./patches <= 0.72 && min(sto[3, :, i], sto[4, :, i])./sum(sto[3:4, :, i]) >= 0.3
+        final_sto = sto[:, end, i]
+        veg_sto = sum(final_sto[2:4])
+        shrubs_sto = sum(final_sto[3:4])
+
+        if 0.18 <= veg_sto / patches <= 0.22 && 0.28 <= final_sto[2] / veg_sto <= 0.32 && 0.68 <= shrubs_sto / veg_sto <= 0.72 && min(final_sto[3], final_sto[4]) / shrubs_sto >= 0.3
             condition_sto += 1
         end
-        
+            
     end
 
     # ## Vérifier les conditions avec une simulation déterministe
 
-    det_sim = simulation(T, s; stochastic=false, generations=gen+1)
-    for i in eachindex(s)
+    det_sim = simulation(transitions, states; stochastic=false, generations=gen+1)
+    for i in eachindex(states)
         lines!(ax, det_sim[i, :], color=states_colors[i], alpha=1, label=states_names[i], linewidth=4)  # on ne peut pas générer le graph avec les stochastiques seulement, car il faut définir les labels, ce qu'on fait juste avec la déterministe
     end
-    if  sum(s[2:4])./patches <= 0.22 && 0.28 <= s[2]./patches <= 0.32 && 0.68 <= sum(s[3:4])./patches <= 0.72 && min(s[3], s[4])./sum(s[3:4]) >= 0.3
+
+    final_det = det_sim[:, end]
+    veg_det = sum(final_det[2:4])
+    shrubs_det = sum(final_det[3:4])
+
+    if 0.18 <= veg_det / patches <= 0.22 && 0.28 <= final_det[2] / veg_det <= 0.32 && 0.68 <= shrubs_det / veg_det <= 0.72 && min(final_det[3], final_det[4]) / shrubs_det >= 0.3
         condition_det = true
-    else
+        else
         condition_det = false
     end
 
@@ -421,18 +430,19 @@ function conditions(transitions, states; gen = 199, iteration = 100, seuil = 0.8
         axislegend(ax)
         tightlimits!(ax)
         current_figure()
-        return(T , s)
+        return(transitions , states)
     else
-        return "$(condition_sto)% des simulations stochastiques correspondent aux conditions recherchées. Il est $(condition_det) de dire que la simulation déterministe y répond."
+        return "$((condition_sto / iteration) * 100)% des simulations stochastiques correspondent aux conditions recherchées. Il est $(condition_det) de dire que la simulation déterministe y répond."
     end
 
 end
-
+resultat = conditions(T, s)
+println(resultat)
 # ## Tester la simulation avec différentes valeurs d'états initiales (tentative d'automatisation)
-@showprogress for s[3] in (0:10:50)
-    conditions(T, s)
-    println("Pour $(s[3]) buissons de l'espèce 1, $(conditions(T, s))")
-end
+#@showprogress for s[3] in (0:10:50)
+    #conditions(T, s)
+    #println("Pour $(s[3]) buissons de l'espèce 1, $(conditions(T, s))")
+#end
 
 # ## Présentez les résultats des simulations, en faisant un lien avec la question initiale.
 

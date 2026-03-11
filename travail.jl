@@ -396,20 +396,219 @@ for i in eachindex(s)
     lines!(ax, det_sim[i, :], color=states_colors[i], alpha=1, label=states_names[i], linewidth=4)
 end
 
-# conditions demandées à la fin pour la déterministe
-if  0.18 <= sum(s[2:4])/nb_parcelle <= 0.22 & 0.28 <= s[2]/patches <= 0.32 & 0.68 <= sum(s[3:4])/patches <= 0.72 & min(s[3], s[4])/sum(s[3], s[4]) >= 0.3
-    return S 
+# ## Réorganisation, c'est plus facile pour moi de comprendre comme ça, quand ça va fonctionner je vais mettre le texte et la
+# documentation au bon endroit
+
+s = [340, 90, 100, 45]
+states = length(s)
+patches = sum(s)
+
+T = zeros(Float64, states, states)
+T[1, :] = [110, 8, 0, 2]
+T[2, :] = [2, 120, 3, 4]
+T[3, :] = [1, 0, 94, 12]
+T[4, :] = [12, 0, 4, 15]
+
+states_names = ["Barren", "Grasses", "Shrubs1", "Shrubs2"]
+states_colors = [:grey40, :orange, :teal, :blue]
+f = Figure()
+ax = Axis(f[1, 1], xlabel="Nb. générations", ylabel="Nb. parcelles")
+
+function verif_etat_initial(s)
+
+    # Si il y a des parcelles herbacées, on rejette cet état initial.
+
+   if s[2] !=0
+        @warn"Il ne faut pas qu'il y a d'herbes à l'état initial. Les herbes furent supprimées."
+        s[2]=0
+    end
+
+    # Si il y a plus ou moins de 200 parcelles, on rejette aussi cet état initial.
+
+    if sum(s) != 200
+        @warn("Il n'y a pas 200 parcelles.")
+        ancienne_valeur1=s[1]
+        ancienne_valeur3= s[3]
+        ancienne_valeur4= s[4]
+        s[1]= floor(((ancienne_valeur1 * 200) / (ancienne_valeur3+ancienne_valeur4+ancienne_valeur1)))
+        s[3]= floor(((ancienne_valeur3 * 200) / (ancienne_valeur3+ancienne_valeur4+ancienne_valeur1)))
+        s[4]= floor(((ancienne_valeur4 * 200) / (ancienne_valeur3+ancienne_valeur4+ancienne_valeur1)))
+        if sum(s)== 199
+            s[1]=s[1]+1
+        end
+    end
+    return s
+end
+
+function verif_nombre_buissons_ini(s)
+
+    # Si jamais le nombre de buissons dépasse 50, on va:
+
+    if (s[3]+s[4]) > 50
+
+            # donner un message d'avertissement
+
+            @warn "Il y avait initialement plus que 50 buissons. Les proportions des nombres donnés furent gardées."
+
+            # et stocker les valeurs qui furent données par l'utilisateur.
+
+            ancienne_valeur3= s[3]
+            ancienne_valeur4= s[4]
+
+            # Par la suite, on change les valeurs, afin qu'elles respectent les conditions, tout en respectant les proportions qui furent données initialement.
+            # Si jamais les nouvelles valeurs donnent des nombres à virgule, on arrondit au nombre le plus bas, puisqu'un buisson et demi n'est pas quelquechose qui est observable dans la réalité.
+
+            s[3]= floor(((ancienne_valeur3 * 50) / (ancienne_valeur3+ancienne_valeur4)))
+            s[4]= floor(((ancienne_valeur4 * 50) / (ancienne_valeur3+ancienne_valeur4)))
+
+            # Dans le cas où les nouvelles proportions, à cause de l'approximation, donnent 49 au lieu de 50, on rajoute une parcelle vide afin qu'il y ait 200 parcelles en tout.
+
+            if (s[3]+s[4]) == 49
+                s[1]= s[1]+1
+            end
+
+            # On retourne le nouvel état initial.
+
+            return s
+    end
+end
+
+function check_transition_matrix!(T)
+    for ligne in axes(T, 1)
+        if sum(T[ligne, :]) != 1
+            @warn "La somme de la ligne $(ligne) n'est pas égale à 1 et a été modifiée"
+            T[ligne, :] ./= sum(T[ligne, :])
+        end
+    end
     return T
-    return current_figure()
-else
-    print("Les conditions ne sont pas respectées")
-end 
+end
 
+function check_function_arguments(transitions, states)
+    if size(transitions, 1) != size(transitions, 2)
+        throw("La matrice de transition n'est pas carrée")
+    end
+
+    if size(transitions, 1) != length(states)
+        throw("Le nombre d'états ne correspond pas à la matrice de transition")
+    end
+    return nothing
+end
+
+function _sim_determ!(timeseries, transitions, generation)
+    pop_change = (timeseries[:, generation]' * transitions)'
+
+    # Cette ligne calcule directement combien de parcelles devraient se retrouver dans chaque état à la prochaine génération.
+    # Ici : timeseries[:, generation] = le vecteur des parcelles actuelles
+    # ' = transpose le vecteur pour permettre la multiplication matricielle
+    # * transitions = applique la matrice de transition
+    # le dernier ' remet le résultat en colonne
+
+    timeseries[:, generation+1] .= pop_change
+    
+    # place directement les valeurs calculées dans la génération suivante.
+
+end
+
+function _sim_stochastic!(timeseries, transitions, generation)
+    for state in axes(timeseries, 1)
+        pop_change = rand(Multinomial(timeseries[state, generation], transitions[state, :])) 
+
+# fait un tirage aléatoire pour savoir comment les parcelles de l’état actuel vont se répartir à la génération suivante.
+# timeseries[state, generation] = combien de parcelles sont dans cet état en ce moment
+# transitions[state, :] = les probabilités de passer vers chaque état possible
+# Multinomial(...) = répartit ces parcelles entre les différents états
+# rand(...) = fait le tirage au hasard
+
+        timeseries[:, generation+1] .+= pop_change
+
+# Cette ligne ajoute le résultat du tirage à la génération suivante.
+    
+    end
+end
+
+function simulation(transitions, states; generations=500, stochastic=false)
+
+    check_transition_matrix!(transitions)
+    check_function_arguments(transitions, states)
+    verif_etat_initial(s)
+    verif_nombre_buissons_ini(s)
+
+    _data_type = stochastic ? Int64 : Float32
+
+        # Cette ligne choisit le type de données utilisé dans la simulation :
+        # Int64 si la simulation est stochastique (on manipule un nombre entier de parcelles)
+        # Float32 si elle est déterministe (on peut avoir des valeurs fractionnaires)
+
+    timeseries = zeros(_data_type, length(states), generations + 1)
+
+        # crée une matrice qui va enregistrer l’évolution du nombre de parcelles dans chaque état au fil des générations. lignes → les états et colonnes → les générations.
+
+    timeseries[:, 1] = states
+
+    _sim_function! = stochastic ? _sim_stochastic! : _sim_determ!
+
+       # Cette ligne choisit quelle fonction utiliser pour la simulation :
+       # _sim_stochastic! si on veut une simulation aléatoire
+       # _sim_determ! si on veut une simulation déterministe
+
+    for generation in Base.OneTo(generations) # Répéter pour chaque génération en gros.
+       _sim_function!(timeseries, transitions, generation)
+    end
+
+   return timeseries # La fonction retourne la matrice timeseries, qui contient l’évolution du nombre de parcelles dans chaque état au fil du temps.
+end
+
+
+# J'obtiens "MethodError: no method matching zeros(::Type{Float64}, ::Vector{Int64}, ::Int64, ::Int64)" quand je met "states" dans "sto", mais length(s) qui correspond
+# a "states" fonctionne...
+
+function conditions(transitions, states; gen = 199, iteration = 100)
+    
+    # ## Vérifier les conditions avec une simulation stochastique
+
+    sto = zeros(Float64, length(s), gen+1, iteration)   # "+1" parce que "_sim_stochastic!" utilise generation+1 pour affecter les valeurs des générations dans timeseries
+    condition_sto = 0   # Indicateur du nombre de simulations stochastiques qui respectent les conditions
+
+    # Réalisation des simulations stochastiques en vérifiant et notant si chaque itération correspond aux critères
+
+    for i in 1:iteration
+        sto_sim = simulation(transitions, states; stochastic=true, generations=gen)
+        sto[:, :, i] = sto_sim
+
+        for j in eachindex(states)
+            lines!(ax, sto_sim[j, :], color=states_colors[j], alpha=0.1)
+        end
+
+        if sum(sto[2:4, 200, i])./patches <= 0.22 && 0.28 <= sto[2, 200, i]./patches <= 0.32 && 0.68 <= sum(sto[3:4, :, i])./patches <= 0.72 && min(sto[3, :, i], sto[4, :, i])./sum(sto[3:4, :, i]) >= 0.3
+            condition_sto += 1
+        end
+        
+    end
+
+    # ## Vérifier les conditions avec une simulation déterministe
+
+    det_sim = simulation(T, s; stochastic=false, generations=gen+1)
+    for i in eachindex(s)
+        lines!(ax, det_sim[i, :], color=states_colors[i], alpha=1, label=states_names[i], linewidth=4)  # on ne peut pas générer le graph savec les stochastiques seulement, car il faut définir les labels, ce qu'on fait juste avec la déterministe
+    end
+    if  sum(s[2:4])./patches <= 0.22 && 0.28 <= s[2]./patches <= 0.32 && 0.68 <= sum(s[3:4])./patches <= 0.72 && min(s[3], s[4])./sum(s[3:4]) >= 0.3
+        condition_det = true
+    else
+        condition_det = false
+    end
+
+    # ## Afficher un graphique si les conditions sont respectées
+    if condition_sto/iteration >= 0.8 && condition_det
+        axislegend(ax)
+        tightlimits!(ax)
+        current_figure()
+        return(T , s)
+    else
+        return "$(condition_sto)% des simulations stochastiques correspondent aux conditions recherchées. Il est $(condition_det) de dire que la simulation déterministe y répond"
+    end
+
+end
 # ## Présentez les résultats des simulations, en faisant un lien avec la question initiale.
-
-axislegend(ax)
-tightlimits!(ax)
-current_figure()
 
 # # Discussion
 
@@ -419,5 +618,3 @@ current_figure()
 # On peut aussi citer des références dans le document `references.bib`,
 # @ermentrout1993cellular -- la bibliographie sera ajoutée automatiquement à la
 # fin du document.
-
-

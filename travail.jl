@@ -482,16 +482,27 @@ function simulation(transitions, states; generations=500, stochastic=false)
    return timeseries # La fonction retourne la matrice timeseries, qui contient l’évolution du nombre de parcelles dans chaque état au fil du temps.
 end
 
-for _ in 1:100
-    sto_sim = simulation(T, s; stochastic=true, generations=200)
-    for i in eachindex(s)
-        lines!(ax, sto_sim[i, :], color=states_colors[i], alpha=0.1)
+iteration = 100
+generation = 199
+sto = zeros(Float64, states, generation, iteration)
+
+for i in 1:iteration
+    sto_sim = simulation(T, s; stochastic=true, generations=generation)
+    sto[:, :, i] = sto_sim
+end
+condition_sto = zeros()
+for i in 1:iteration
+    if sto[i, :, :] #les conditions
+        
     end
 end
 
+#for j in eachindex(s)
+#   lines!(ax, sto_sim[j, :], color=states_colors[j], alpha=0.1)
+#end
 det_sim = simulation(T, s; stochastic=false, generations=200)
 if  sum(s[2:4])/patches <= 0.22 && 0.28 <= s[2]/patches <= 0.32 && 0.68 <= sum(s[3:4])/patches <= 0.72 && min(s[3], s[4])/sum(s[3], s[4]) >= 0.3
-    print("Les conditions ne sont pas respectées")
+    print("Les conditions pour la simulation déterministe ne sont pas respectées")
 else
     print("Il faudrait afficher S, T et la figure")
 end
@@ -509,5 +520,3 @@ current_figure()
 # On peut aussi citer des références dans le document `references.bib`,
 # @ermentrout1993cellular -- la bibliographie sera ajoutée automatiquement à la
 # fin du document.
-
-

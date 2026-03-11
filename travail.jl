@@ -93,6 +93,7 @@
 
 using CairoMakie
 using Distributions
+using ProgressMeter
 
 import Random
 Random.seed!(2045)
@@ -361,7 +362,7 @@ ax = Axis(f[1, 1], xlabel="Nb. générations", ylabel="Nb. parcelles")
 # a "states" fonctionne...
 
 """
-function conditions(transitions, states; gen = 199, iteration = 100)
+function conditions(transitions, states; gen = 199, iteration = 100, seuil = 0.8)
 
 Fonction qui génère les simulations stochastiques et la simulaton déterministe afin de vérifier si les conditions recherchées dans la question sont respectées. Pour les
 simulations stochastiques, un score est enregistré dans la variable condition_sto lorsqu'elles respectent les conditions. Ce score est ensuite comparé à une valeur seuil
@@ -373,6 +374,7 @@ transitions : La matrice de transition
 states : Le nombre d'état possible dans la simulation
 generation : Nombre de générations à simuler (199 par défaut)
 iteration : Le nombre de simulations stochastiques qui sont générées
+seuil : proportions des simulations stochastiques qui doivent répondre au critères pour qu'on considère que ça fonctionne
 """
 
 function conditions(transitions, states; gen = 199, iteration = 100, seuil = 0.8)
@@ -417,12 +419,17 @@ function conditions(transitions, states; gen = 199, iteration = 100, seuil = 0.8
         current_figure()
         return(T , s)
     else
-        return "$(condition_sto)% des simulations stochastiques correspondent aux conditions recherchées. Il est $(condition_det) de dire que la simulation déterministe y répond"
+        return "$(condition_sto)% des simulations stochastiques correspondent aux conditions recherchées. Il est $(condition_det) de dire que la simulation déterministe y répond."
     end
 
 end
 
-conditions(T, s)
+# ## Tester la simulation avec différentes valeurs d'états initiales (tentative d'automatisation)
+@showprogress for s[3] in (0:10:50)
+    conditions(T, s)
+    println("Pour $(s[3]) buissons de l'espèce 1, $(conditions(T, s))")
+end
+
 # ## Présentez les résultats des simulations, en faisant un lien avec la question initiale.
 
 # # Discussion
@@ -434,7 +441,7 @@ conditions(T, s)
 # @ermentrout1993cellular -- la bibliographie sera ajoutée automatiquement à la
 # fin du document.
 
-# ## Simulation Stochastique
+# ## Je garde cette partie là du code pour qu'on puisse tester les visuels du graphique même si on ne répond pas aux conditions
 
 # Exécutation de la simulation stochastique 100 fois pour voir la variabilité possible de la succession écologique vu le hasard.
 
@@ -444,7 +451,6 @@ for _ in 1:100
         lines!(ax, sto_sim[i, :], color=states_colors[i], alpha=0.1)
     end
 end
-# ## Simulation Deterministe
 
 # Exécution d'une simulation déterministe pour représenter la trajectoire attendue du système quand les probabilités de transition d'états sont 
 # appliquées sans variabilité aléatoire. Elle est une ligne noire.
@@ -453,3 +459,9 @@ det_sim = simulation(T, s; stochastic=false, generations=200)
 for i in eachindex(s)
     lines!(ax, det_sim[i, :], color=states_colors[i], alpha=1, label=states_names[i], linewidth=4)
 end
+
+axislegend(ax)
+tightlimits!(ax)
+current_figure()
+
+println(T , s)

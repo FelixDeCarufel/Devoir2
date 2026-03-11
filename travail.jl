@@ -487,27 +487,35 @@ function simulation(transitions, states; generations=500, stochastic=false)
    return timeseries # La fonction retourne la matrice timeseries, qui contient l’évolution du nombre de parcelles dans chaque état au fil du temps.
 end
 
-iteration = 100
-gen = 499
 
-function conditions(transitions, states; gen = 199, iteration = 100)    #MethodError: no method matching zeros(::Type{Float64}, ::Vector{Int64}, ::Int64, ::Int64) quand je met states dans sto, mais length(s) qui correspond a states fonctionne
+# J'obtiens "MethodError: no method matching zeros(::Type{Float64}, ::Vector{Int64}, ::Int64, ::Int64)" quand je met "states" dans "sto", mais length(s) qui correspond
+# a "states" fonctionne...
+
+function conditions(transitions, states; gen = 199, iteration = 100)
+    
     # ## Vérifier les conditions avec une simulation stochastique
-    sto = zeros(Float64, length(s), gen+1, iteration)   # "+1" parce que _sim_stochastic! utilise generation+1 pour affecter les valeurs des générations dans timeseries
-    condition_sto = 0   # si une des simulations stochastiques répond aux critères, on ajoute 1
+
+    sto = zeros(Float64, length(s), gen+1, iteration)   # "+1" parce que "_sim_stochastic!" utilise generation+1 pour affecter les valeurs des générations dans timeseries
+    condition_sto = 0   # Indicateur du nombre de simulations stochastiques qui respectent les conditions
+
+    # Réalisation des simulations stochastiques en vérifiant et notant si chaque itération correspond aux critères
+
     for i in 1:iteration
         sto_sim = simulation(transitions, states; stochastic=true, generations=gen)
         sto[:, :, i] = sto_sim
+
+        for j in eachindex(states)
+            lines!(ax, sto_sim[j, :], color=states_colors[j], alpha=0.1)
+        end
 
         if sum(sto[2:4, 200, i])./patches <= 0.22 && 0.28 <= sto[2, 200, i]./patches <= 0.32 && 0.68 <= sum(sto[3:4, :, i])./patches <= 0.72 && min(sto[3, :, i], sto[4, :, i])./sum(sto[3:4, :, i]) >= 0.3
             condition_sto += 1
         end
         
-        for j in eachindex(states)
-            lines!(ax, sto_sim[j, :], color=states_colors[j], alpha=0.1)
-         end
     end
 
     # ## Vérifier les conditions avec une simulation déterministe
+
     det_sim = simulation(T, s; stochastic=false, generations=gen+1)
     for i in eachindex(s)
         lines!(ax, det_sim[i, :], color=states_colors[i], alpha=1, label=states_names[i], linewidth=4)  # on ne peut pas générer le graph savec les stochastiques seulement, car il faut définir les labels, ce qu'on fait juste avec la déterministe
@@ -518,20 +526,18 @@ function conditions(transitions, states; gen = 199, iteration = 100)    #MethodE
         condition_det = false
     end
 
-    # Afficher un graphique si les conditions sont respectées
+    # ## Afficher un graphique si les conditions sont respectées
     if condition_sto/iteration >= 0.8 && condition_det
         axislegend(ax)
         tightlimits!(ax)
         current_figure()
-        return(T, s)
+        return(T , s)
     else
-        return condition_sto, condition_det
+        return "$(condition_sto)% des simulations stochastiques correspondent aux conditions recherchées. Il est $(condition_det) de dire que la simulation déterministe y répond"
     end
 
 end
 # ## Présentez les résultats des simulations, en faisant un lien avec la question initiale.
-
-
 
 # # Discussion
 

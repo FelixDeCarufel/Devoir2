@@ -338,6 +338,11 @@ T[2, :] = [2, 120, 3, 4]
 T[3, :] = [1, 0, 94, 12]
 T[4, :] = [12, 0, 4, 15]
 
+states_names = ["Barren", "Grasses", "Shrubs1", "Shrubs2"]
+states_colors = [:grey40, :orange, :teal, :blue]
+f = Figure()
+ax = Axis(f[1, 1], xlabel="Nb. générations", ylabel="Nb. parcelles")
+
 function verif_etat_initial(s)
 
     # Si il y a des parcelles herbacées, on rejette cet état initial.
@@ -482,35 +487,48 @@ function simulation(transitions, states; generations=500, stochastic=false)
    return timeseries # La fonction retourne la matrice timeseries, qui contient l’évolution du nombre de parcelles dans chaque état au fil du temps.
 end
 
+# ## Vérifier les conditions avec une simulation stochastique
 iteration = 100
 generation = 199
-sto = zeros(Float64, states, generation, iteration)
+sto = zeros(Float64, states, generation+1, iteration)   # "+1" parce que _sim_stochastic! utilise generation+1 pour affecter les valeurs des générations dans timeseries
+condition_sto = 0
 
 for i in 1:iteration
     sto_sim = simulation(T, s; stochastic=true, generations=generation)
     sto[:, :, i] = sto_sim
-end
-condition_sto = zeros()
-for i in 1:iteration
-    if sto[i, :, :] #les conditions
-        
+
+    for j in eachindex(s)
+        lines!(ax, sto_sim[j, :], color=states_colors[j], alpha=0.1)
+    end
+    if sum(sto[2:4, 200, i])/patches <= 0.22 && 0.28 <= sto[2, 200, i]/patches <= 0.32 && 0.68 <= sum(sto[3:4, :, i])/patches <= 0.72 && min(sto[3, :, i], sto[4, :, i])/sum(sto[3:4, :, i]) >= 0.3
+        condition_sto += 1
     end
 end
 
-#for j in eachindex(s)
-#   lines!(ax, sto_sim[j, :], color=states_colors[j], alpha=0.1)
-#end
+# ## Vérifier les conditions avec une simulation déterministe
+
 det_sim = simulation(T, s; stochastic=false, generations=200)
-if  sum(s[2:4])/patches <= 0.22 && 0.28 <= s[2]/patches <= 0.32 && 0.68 <= sum(s[3:4])/patches <= 0.72 && min(s[3], s[4])/sum(s[3], s[4]) >= 0.3
-    print("Les conditions pour la simulation déterministe ne sont pas respectées")
+for i in eachindex(s)
+    lines!(ax, det_sim[i, :], color=states_colors[i], alpha=1, label=states_names[i], linewidth=4)
+end
+if  sum(s[2:4])/patches <= 0.22 && 0.28 <= s[2]/patches <= 0.32 && 0.68 <= sum(s[3:4])/patches <= 0.72 && min(s[3], s[4])/sum(s[3:4]) >= 0.3
+    condition_det = true
 else
-    print("Il faudrait afficher S, T et la figure")
+    condition_det = false
+end
+
+# ## Afficher un graphique si les conditions sont respectées
+if condition_sto/iteration >= 0.8 && condition_det
+    axislegend(ax)
+    tightlimits!(ax)
+    current_figure()
+
+else
+    print(condition_sto, condition_det)
 end
 # ## Présentez les résultats des simulations, en faisant un lien avec la question initiale.
 
-axislegend(ax)
-tightlimits!(ax)
-current_figure()
+
 
 # # Discussion
 

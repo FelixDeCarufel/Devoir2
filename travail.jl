@@ -321,6 +321,8 @@ function simulation(transitions, states; generations=500, stochastic=false)
 
     check_transition_matrix!(transitions)
     check_function_arguments(transitions, states)
+    verif_etat_initial(s)
+    verif_nombre_buissons_ini(s)
 
     _data_type = stochastic ? Int64 : Float32
 
@@ -378,6 +380,8 @@ seuil : proportions des simulations stochastiques qui doivent répondre au crit�
 """
 
 function conditions(transitions, states; gen = 199, iteration = 100, seuil = 0.8)
+
+
     
     # ## Vérifier les conditions avec une simulation stochastique
 

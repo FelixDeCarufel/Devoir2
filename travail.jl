@@ -164,7 +164,25 @@ function check_function_arguments(transitions, states)
 end
 
 # ## On crée une fonction afin de vérfier que le nombre de buissons à l'état initial respecte les conditions imposées.
+"""
+    verif_nombre_buissons_ini(s)
 
+Vérifier le nombre de buissons à l'état initial (s) et voir s'il respecte les conditions imposées par le devoir.
+
+S'il y a plus de 50 buissons, on les modifie afin qu'ils aient les mêmes proportions, mais avec 50 buissons.
+Dans les cas où les nouvelles proportions engendrent une somme de 49, on rajoute une parcelle chez l'état vide.
+
+# Examples
+```julia-repl
+julia> s = [150,0,35,35]
+julia> verif_nombre_buissons_ini(s) 
+4-element Vector{Int64}:
+ 150
+   0
+  25
+  25
+```
+"""
 function verif_nombre_buissons_ini(s)
 
     # Si jamais le nombre de buissons dépasse 50, on va:
@@ -198,7 +216,31 @@ function verif_nombre_buissons_ini(s)
     end
 end
 
+# On utilise la fonction pour qu'elle rectifie le nombre de buissons initial.
+
+verif_nombre_buissons_ini(s)
 # ## On crée une fonction qui vérifie qu'il n'y a pas d'herbes et qu'il n'y a pas plus de 50 buissons à l'état initial.
+
+"""
+    verif_etat_initial(s)
+
+Vérifier l'état initial (s) et voir s'il respecte les conditions imposées par le devoir.
+
+S'il y a des parcelles herbacées, elles sont supprimées.
+Si la somme des parcelles n'équivaut pas à 200, les autres valeurs (vides, buisson1 et buisson2) sont modifiées en respectant leurs proportions, mais en étant à 200.
+
+
+# Examples
+```julia-repl
+julia> s = [200,10,35,35]
+julia> verif_etat_initial(s) 
+4-element Vector{Int64}:
+ 150
+   0
+  25
+  25
+```
+"""
 
 function verif_etat_initial(s)
 
@@ -212,19 +254,41 @@ function verif_etat_initial(s)
     # Si il y a plus ou moins de 200 parcelles, on rejette aussi cet état initial.
 
     if sum(s) != 200
+
+        # On donne un message d'avertissement.
+
         @warn("Il n'y a pas 200 parcelles.")
+
+        # On stocke les anciennes valeurs,
+
         ancienne_valeur1=s[1]
         ancienne_valeur3= s[3]
         ancienne_valeur4= s[4]
+
+        # On les arrondit au nombre le plus bas, selon des proportions où leur somme est égale à 200.
+
         s[1]= floor(((ancienne_valeur1 * 200) / (ancienne_valeur3+ancienne_valeur4+ancienne_valeur1)))
         s[3]= floor(((ancienne_valeur3 * 200) / (ancienne_valeur3+ancienne_valeur4+ancienne_valeur1)))
         s[4]= floor(((ancienne_valeur4 * 200) / (ancienne_valeur3+ancienne_valeur4+ancienne_valeur1)))
+        
+         # En les arrondissant au nombre le plus bas, il devient possible que la somme des parcelles ne soit pas égale à 200. Si c'est le cas, on rajoute les parcelles manquantes à celles de l'état vide.
+        
         if sum(s)== 199
             s[1]=s[1]+1
         end
     end
     return s
 end
+
+# On utilise la fonction pour qu'elle rectifie l'état initial si c'est nécessaire.
+
+verif_etat_initial(s)
+
+# Le nombre d'états et le nombre de parcelles dépendent de l'état initial.
+# Le nombre d'états équivaut au nombre de conditions possibles à l'état initial, le nombre de parcelles et la somme des nombres de chacun de ses états.
+
+states = length(s)
+patches = sum(s)
 # ## Fonction _sim_stochastic
 
 # Cette fonction simule le tout de façon stochastique. Pour toutes les parcelles, elle va répartir de façon aléatoire celles-ci vers les états possibles de la génération suivante.

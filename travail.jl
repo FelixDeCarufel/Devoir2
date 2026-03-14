@@ -270,7 +270,7 @@ function verif_etat_initial(s)
         
          # En les arrondissant au nombre le plus bas, il devient possible que la somme des parcelles ne soit pas égale à 200. Si c'est le cas, on rajoute les parcelles manquantes à celles de l'état vide.
         
-        if sum(s)== 199
+        if patches == 199
             s[1]=s[1]+1
         end
     end
@@ -442,7 +442,7 @@ function conditions(transitions, states; gen = 199, iteration = 100, seuil = 0.8
     verif_nombre_buissons_ini(s)
     verif_etat_initial(s)
 
-    
+    patches = sum(states)
     # ## Vérifier les conditions avec une simulation stochastique
 
     sto = zeros(Float64, length(states), gen+1, iteration)   # "+1" parce que "_sim_stochastic!" utilise generation+1 pour affecter les valeurs des générations dans timeseries
@@ -523,22 +523,22 @@ println(resultat)
 
 # ## Je garde cette partie là du code pour qu'on puisse tester les visuels du graphique même si on ne répond pas aux conditions
 
-# Exécutation de la simulation stochastique 100 fois pour voir la variabilité possible de la succession écologique vu le hasard.
+# Exécution de la simulation stochastique 100 fois pour voir la variabilité possible de la succession écologique vu le hasard.
 
-for _ in 1:100
-    sto_sim = simulation(T, s; stochastic=true, generations=200)
-    for i in eachindex(s)
-        lines!(ax, sto_sim[i, :], color=states_colors[i], alpha=0.1)
-    end
-end
+#for _ in 1:100
+#    sto_sim = simulation(T, s; stochastic=true, generations=200)
+#    for i in eachindex(s)
+#        lines!(ax, sto_sim[i, :], color=states_colors[i], alpha=0.1)
+#    end
+#end
 
 # Exécution d'une simulation déterministe pour représenter la trajectoire attendue du système quand les probabilités de transition d'états sont 
 # appliquées sans variabilité aléatoire. Elle est une ligne noire.
 
-det_sim = simulation(T, s; stochastic=false, generations=200)
-for i in eachindex(s)
-    lines!(ax, det_sim[i, :], color=states_colors[i], alpha=1, label=states_names[i], linewidth=4)
-end
+#det_sim = simulation(T, s; stochastic=false, generations=200)
+#for i in eachindex(s)
+#    lines!(ax, det_sim[i, :], color=states_colors[i], alpha=1, label=states_names[i], linewidth=4)
+#end
 
 axislegend(ax)
 tightlimits!(ax)

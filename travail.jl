@@ -17,10 +17,6 @@
 # ---
 
 # # Introduction
-
-# Vous pouvez utiliser la syntaxe suivante pour l'_italique_, le **gras**, et
-# les caractères `monospace`.
-
 # ## Mise en contexte
 
 # On utilise le concept de succession écologique pour décrire le cycle des espèces présentes sur un territoire suite à une perturbation, qu'elle soit naturelle ou 
@@ -33,10 +29,6 @@
 # qu'elles ne posent pas de problème aux infrastructures lorsque la communauté végétale atteint l'équilibre. De plus, un nombre minimal d'espèces devrait être considéré
 # afin de négliger les impacts des modifications anthropologiques sur la biodiversité. Trejo-Pérez et ses collègues (2023) ont prouvé qu'une grande sélection d'espèces
 # herbacées avait non seulement un impact positif sur la biodiversité, mais que cela permettait aussi de contrer l'établissement d'arbres plus efficacement.
-
-
-# ajouter les sources dans la bibliographie : ISBN: 9780135188743 et DOI: 10.1111/avsc.12781
-
 # ## Question
 
 # Si on devait choisir une espèce d'herbacée et 2 espèces de buissons afin d'aménager un corridor de 200 parcelles sous une ligne à haute tension, lesquelles devraient-on 
@@ -80,15 +72,12 @@
 # Il y a deux types de simulation, une stochastique et l'autre déterministe. La stochastique inclut une composante aléatoire dans les transitions entre états et la déterministe
 # représente la trajectoire moyenne attendue du système qui elle reste fixe dans le temps. Alors, les probabilités de transition sont constantes et ne dépendent pas de la 
 # position spatiale des parcelles ainsi que de la composition du voisinage des parcelles. 
-
-# On commence une sous-section avec # ## Titre
 # # Code pour le modèle
 
 # En utilisant autant de sous-sections que nécessaire, expliquez le code que
 # vous utilisez pour simuler le modèle. Le texte est aussi important que le code
 # en lui-même, et doit faire des liens entre les choix de programmation et la
 # question biologique.
-
 # ## Packages nécessaires pour la simulation
 
 using CairoMakie
@@ -102,25 +91,24 @@ Random.seed!(2045)
 
 # Vecteur d'états initales des parcelles selon leurs états. On a rajouté un état étant le Shrubs2 pour avoir les 2 types buisson.
 
-s = [340, 90, 100, 45]
+s = [150, 0, 25, 25]
 states = length(s)
 patches = sum(s)
 
 # Matrice de probabilités de transition d'un état à l'autre.
 
 T = zeros(Float64, states, states)
-T[1, :] = [110, 8, 0, 2]
-T[2, :] = [2, 120, 3, 4]
-T[3, :] = [1, 0, 94, 12]
-T[4, :] = [12, 0, 4, 15]
-
+T[1, :] = [85, 6, 7, 7]
+T[2, :] = [60, 10, 5, 5]
+T[3, :] = [75, 2, 7, 7]
+T[4, :] = [80, 6, 7, 7]
 # ## Fonction check_tansition_matrix
 
 # Fonction vérifiant que chaque ligne de la matrice de transition correspond à des probabilités. La somme des probabilités sur la ligne de matrice de transition doient 
 # être égale à 1 pour que toutes les parcelles soient dans un état quelconque au temps t+1. Si ce n'est pas le cas, la fonction normalise automatiquement les valeurs.
 
 """ 
-function check_tansition_matrix!(T)
+    function check_tansition_matrix!(T)
 
 Fonction vérifiant que chaque ligne de la matrice de transition correspond à des probabilités. La somme des probabilités sur la ligne de matrice de transition doient 
 être égale à 1, si ce n'est pas le cas, la fonction normalise automatiquement les valeurs.
@@ -143,7 +131,7 @@ end
 # incohérences entre les états possibles et leur matrice de transition. 
 
 """
-function check_function_arguments(transitions, states)
+    function check_function_arguments(transitions, states)
 
 Fonction vérifiant que la matrice de transition est bien carrée et que le nombre d’états correspond à la taille de la matrice. Permet d'éviter des
 incohérences entre les états possibles et leur matrice de transition. 
@@ -270,14 +258,13 @@ function verif_etat_initial(s)
         
          # En les arrondissant au nombre le plus bas, il devient possible que la somme des parcelles ne soit pas égale à 200. Si c'est le cas, on rajoute les parcelles manquantes à celles de l'état vide.
         
-        if sum(s)== 199
+        if patches == 199
             s[1]=s[1]+1
         end
     end
     return s
 
 end
-
 
 # Le nombre d'états et le nombre de parcelles dépendent de l'état initial.
 # Le nombre d'états équivaut au nombre de conditions possibles à l'état initial, le nombre de parcelles et la somme des nombres de chacun de ses états.
@@ -290,7 +277,7 @@ patches = sum(s)
 # Tout cela selon les probabilités de la matrice de transition. Donc, elle représente donc le caractère aléatoire de la succession écologique simuler ici de façon stochastique.
 
 """
-function _sim_stochastic!(timeseries, transitions, generation)
+    function _sim_stochastic!(timeseries, transitions, generation)
 
 Fonction simulant de façon stochastique. Pour toutes les parcelles, elle va répartir de façon aléatoire celles-ci vers les états possibles de la génération suivante.
 Tout cela selon les probabilités de la matrice de transition.
@@ -317,7 +304,6 @@ function _sim_stochastic!(timeseries, transitions, generation)
     
     end
 end
-
 # ## Fonction _sim_determ
 
 # Cette fonction simule le tout de façon déterministe. Elle calcule directement la composition attendue des états des différentes parcelles selon 
@@ -326,7 +312,7 @@ end
 
 # À partir d'ici les commentaires c'est pour nous on les enlèvera à la fin mais ça nous permet de comprendre le tout:
 """
-function __sim_determ!(timeseries, transitions, generation)
+    function __sim_determ!(timeseries, transitions, generation)
 
 Fonction simulant de façon déterministe. Elle calcule directement la composition attendue des états des différentes parcelles selon l'état de base de celles-ci 
 et la matrice de transition. Donc, à la génération suivante, on va obtenir les états des parcelles en appliquant la matrice de transition. Elle représente donc une 
@@ -365,7 +351,7 @@ end
 # stochastic → permet de choisir une simulation stochastique ou déterministe
 
 """
-function simulation(transitions, states; generations=500, stochastic=false)
+    function simulation(transitions, states; generations=500, stochastic=false)
 
 Fonction exécutant la simulation complète. Elle va initialiser les états des parcelles, puis appliquer les vérifications nécessaires et finalement simuler
 l’évolution du corridor sur plusieurs générations. Elle permet donc d’observer comment la composition végétale va changer au fil du temps jusqu’à l'équilibre.
@@ -418,7 +404,7 @@ ax = Axis(f[1, 1], xlabel="Nb. générations", ylabel="Nb. parcelles")
 # a "states" fonctionne...
 
 """
-function conditions(transitions, states; gen = 199, iteration = 100, seuil = 0.8)
+    function conditions(transitions, states; gen = 199, iteration = 100, seuil = 0.8)
 
 Fonction qui génère les simulations stochastiques et la simulaton déterministe afin de vérifier si les conditions recherchées dans la question sont respectées. Pour les
 simulations stochastiques, un score est enregistré dans la variable condition_sto lorsqu'elles respectent les conditions. Ce score est ensuite comparé à une valeur seuil
@@ -430,19 +416,18 @@ transitions : La matrice de transition
 states : Le nombre d'état possible dans la simulation
 generation : Nombre de générations à simuler (199 par défaut)
 iteration : Le nombre de simulations stochastiques qui sont générées
-seuil : proportions des simulations stochastiques qui doivent répondre au critères pour qu'on considère que ça fonctionne
 """
 
-function conditions(transitions, states; gen = 199, iteration = 100, seuil = 0.8)
+function conditions(transitions, states; gen = 199, iteration = 100)
 
     # S'assurer que les conditions initiales sont respectées
 
     check_transition_matrix!(transitions)
     check_function_arguments(transitions, states)
-    verif_nombre_buissons_ini(s)
-    verif_etat_initial(s)
+    states = verif_nombre_buissons_ini(s)
+    states = verif_etat_initial(s)
 
-    
+    patches = sum(states)
     # ## Vérifier les conditions avec une simulation stochastique
 
     sto = zeros(Float64, length(states), gen+1, iteration)   # "+1" parce que "_sim_stochastic!" utilise generation+1 pour affecter les valeurs des générations dans timeseries
@@ -464,7 +449,7 @@ function conditions(transitions, states; gen = 199, iteration = 100, seuil = 0.8
         veg_sto = sum(final_sto[2:4])
         shrubs_sto = sum(final_sto[3:4])
 
-        if 0.18 <= veg_sto./patches <= 0.22 && 0.28 <= final_sto[2]./veg_sto <= 0.32 && 0.68 <= shrubs_sto./veg_sto <= 0.72 && min(final_sto[3], final_sto[4])./shrubs_sto >= 0.3
+        if 0.10 <= veg_sto./patches <= 0.30 && 0.20 <= final_sto[2]./veg_sto <= 0.30 && 0.60 <= shrubs_sto./veg_sto <= 0.80 && min(final_sto[3], final_sto[4])./shrubs_sto >= 0.3
             condition_sto += 1
         end
         
@@ -489,59 +474,54 @@ function conditions(transitions, states; gen = 199, iteration = 100, seuil = 0.8
         condition_det = false
     end
 
-    # ## Afficher un graphique si les conditions sont respectées
-    if condition_sto/iteration >= seuil && condition_det
-        axislegend(ax)
-        tightlimits!(ax)
-        current_figure()
-        return(T , s)
-    else
-        return "$(condition_sto)% des simulations stochastiques correspondent aux conditions recherchées. Il est $(condition_det) de dire que la simulation déterministe y répond."
-    end
-
+    return "Une population initiale de $(s[1]) parcelles vides, $(s[2]) parcelles avec de l'herbe, $(s[3]) parcelles occupées par des buissons de l'espèce 1 et $(s[4]) 
+    parcelles occupées par des buissons de l'espèce  avec une matrice de transition de $(T), mène à une population finale de $(final_det[1]) parcelles vides, 
+    $(final_det[2]) parcelles avec de l'herbe, $(final_det[3]) parcelles avec des buissons de l'espèce 1 et $(final_det[4]) parcelles avec des buissons de l'espèce 2.
+    Dans ce scénario, $(condition_sto)% des simulations stochastiques correspondent aux conditions recherchées. Il est $(condition_det) de dire que la simulation 
+    déterministe y répond."
+    
 end
 
 resultat = conditions(T, s)
 println(resultat)
 
-# ## Tester la simulation avec différentes valeurs d'états initiales (tentative d'automatisation)
-#@showprogress for s[3] in (0:10:50)
-#    conditions(T, s)
-#    println("Pour $(s[3]) buissons de l'espèce 1, $(conditions(T, s))")
-#end
-
+# # Résultat des simulations et discussion
 # ## Présentez les résultats des simulations, en faisant un lien avec la question initiale.
-
-# # Discussion
-
-# Concluez sur le résultat, et sur les limitations du modèle.
-# Comparez ces résultats aux résultats d'un modèle non stochastique.
-# # Comment citer
-# On peut aussi citer des références dans le document `references.bib`,
-# @ermentrout1993cellular -- la bibliographie sera ajoutée automatiquement à la
-# fin du document.
-
-# ## Je garde cette partie là du code pour qu'on puisse tester les visuels du graphique même si on ne répond pas aux conditions
-
-# Exécutation de la simulation stochastique 100 fois pour voir la variabilité possible de la succession écologique vu le hasard.
-
-for _ in 1:100
-    sto_sim = simulation(T, s; stochastic=true, generations=200)
-    for i in eachindex(s)
-        lines!(ax, sto_sim[i, :], color=states_colors[i], alpha=0.1)
-    end
-end
-
-# Exécution d'une simulation déterministe pour représenter la trajectoire attendue du système quand les probabilités de transition d'états sont 
-# appliquées sans variabilité aléatoire. Elle est une ligne noire.
-
-det_sim = simulation(T, s; stochastic=false, generations=200)
-for i in eachindex(s)
-    lines!(ax, det_sim[i, :], color=states_colors[i], alpha=1, label=states_names[i], linewidth=4)
-end
 
 axislegend(ax)
 tightlimits!(ax)
 current_figure()
+ 
+# # Discussion
 
-println(T , s)
+# ## Recherche de la matrice de transition idéale
+
+# Lorsque l'on aménage les 200 parcelles au départ, il faut planter 50 buissons et il ne peut pas y avoir d'herbes. L'aménagement
+# d'un nombre égale des 2 espèces de buissons augmente les chances d'arriver à des populations qui ont une abondance similaire 
+# lorsqu'à l'équilibre. Afin de trouver la meilleure matrice de transition possible pour répondre aux critères demandés, nous avons
+# commencé en donnait une matrice de transition identique pour les 4 états qui est de 80% de transition à _barren_ afin de respecter 
+# l'obtention de 20% d'espèces végétales, 6% de transition à _grasses_ pour que 30% des parcelles végétalisées soient de l'herbe
+# et les 14% de transition restant ont été répartis également entre les 2 espèces de _shrubs_ afin de ne pas avoir une sur-représentation
+# d'une des 2 espèces. À partir de cette matrice de départ, des modifications par essais-erreurs ont été effectuées en gardant en
+# tête que les transitions vers l'état _barren_ doit rester élevé, celles ver _grasses_ doivent être faibles et celles vers les 2
+# états de _shrubs_ doivent être similaires.
+# ## Limitations du modèle
+
+# Les conditions d'équilibres imposées ont été observées avec un intervale de plus ou moins 10% dans la simlution de notre modèle stochastique afin de prendre en compte 
+# l'effet de la stochasticité. Il est nécessaire d'ajouter un intervale, mais malgré celui-ci, seulement 48% des simulations répondent aux conditions demandées. Il serait 
+# possible d'agrandir cet interval afin de pouvoir augmenter ce %, mais nous trouvons que plus de 10% commence à diverger grandement des objetifs fixés.
+
+# Les 2 vecteurs de transitions propres aux espèces de buissons, sont quasiment identiques. D'un point de vue, biologique il semble très peu probable d'avoir deux espèces
+# différentes qui ont un cycle de succession quasi-identique comme modélisé ici.
+
+# Concluez sur le Résultat
+
+# La matrice de transition met une grande emphase sur le retour à l'état _barren_ pour toutes les espèces végétales. Il serait
+# possible d'interpréter ces résultats comme une pression anthropologique afin de maintenir l'intégriter des lignes électriques
+# ou la présence de nombre élevé d'herbivores. Si la pression des herbivores n'était pas suffisante, introduire une cinquième 
+# espèce permettrait de réduire l'entretient requis.
+
+# Comparez ces résultats aux résultats d'un modèle non stochastique.
+
+
+

@@ -26,8 +26,6 @@ _Les informations doivent être les suivantes. Les tags `bio2045` et `h26-devoir
 
 ![Capture d'écran de la création du nouveau dépôt](.assets/scrot-options.png)
 
-<!-- Vous devrez supprimer jusqu'à, et incluant ce commentaire -->
-
 ## Instruction
 
 En utilisant le code de la séance sur les modèles de transition végétale, simulez une intervention et évaluez son efficacité. Les consignes spécifiques sont dans les instructions de l'activité.
@@ -39,6 +37,8 @@ Pour atteindre un équilibre entre biodiversité et sécurité des infrastructur
 Le corridor qu'on souhaite aménager se découpe en 200 parcelles, qui sont toutes initialement vides (on vient de dégager le trajet pour la ligne à haute tension), mais vous pouvez planter jusqu'à 50 parcelles avec un mélange de buissons de votre choix.
 
 Identifiez (i) une population initiale et (ii) une matrice de transition, qui décrit les caractéristiques des espèces à planter, qui permettent de garantir que les critères fixés seront respectés dans au moins 80% des simulations. Comparez ces résultats aux résultats d'un modèle non stochastique.
+
+<!-- Vous devrez supprimer jusqu'à, et incluant ce commentaire -->
 
 ## Organisation du projet
 

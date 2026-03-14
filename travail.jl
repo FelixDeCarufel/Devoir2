@@ -102,17 +102,17 @@ Random.seed!(2045)
 
 # Vecteur d'états initales des parcelles selon leurs états. On a rajouté un état étant le Shrubs2 pour avoir les 2 types buisson.
 
-s = [340, 90, 100, 45]
+s = [150, 0, 25, 25]
 states = length(s)
 patches = sum(s)
 
 # Matrice de probabilités de transition d'un état à l'autre.
 
 T = zeros(Float64, states, states)
-T[1, :] = [110, 8, 0, 2]
-T[2, :] = [2, 120, 3, 4]
-T[3, :] = [1, 0, 94, 12]
-T[4, :] = [12, 0, 4, 15]
+T[1, :] = [80, 6, 7, 7]
+T[2, :] = [80, 6, 7, 7]
+T[3, :] = [80, 6, 7, 7]
+T[4, :] = [80, 6, 7, 7]
 
 # ## Fonction check_tansition_matrix
 
@@ -498,7 +498,7 @@ function conditions(transitions, states; gen = 199, iteration = 100, seuil = 0.8
     else
         return "$(condition_sto)% des simulations stochastiques correspondent aux conditions recherchées. Il est $(condition_det) de dire que la simulation déterministe y répond."
     end
-
+    
 end
 
 resultat = conditions(T, s)
@@ -543,5 +543,3 @@ println(resultat)
 axislegend(ax)
 tightlimits!(ax)
 current_figure()
-
-println(T , s)

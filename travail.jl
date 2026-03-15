@@ -10,10 +10,10 @@
 #      prenom: Maxim
 #      matricule: 20269875
 #      github: Max80780
-#    - nom: Auteur
-#      prenom: Troisième
-#      matricule: XXXXXXXX
-#      github: TroisiAut
+#    - nom: Benbezza
+#      prenom: Younes
+#      matricule: 20315516
+#      github: Un-Connu
 # ---
 
 # # Introduction
@@ -38,12 +38,12 @@
 
 # ## Hypothèse et résultats attendus
 
-# L'hypothèse stipule que pour respecter les contraintes, il faudra choisir une matrice de transition qui va favoriser le maintient des parcelles vides, mais qui permet tout de
+# L'hypothèse stipule que pour respecter les contraintes, il faudra choisir une matrice de transition qui va favoriser le maintien des parcelles vides, mais qui permet tout de
 # même une colonisation modérée par les herbacées et un établissement plus stable et présent des deux espèces de buissons. 
 # Comme seulement 20 % des 200 parcelles doivent être végétalisées à l’équilibre, on prévoit que les probabilités de transition vers les états végétalisés 
 # demeurent assez faibles, alors que les probabilités de rester dans l’état vide devraient être élevées. On prévoit aussi que l'espèce d'herbacée devra avoir une stabilité plus 
-# faible que les buissons pour représenter le 30% dees parcelles végétalisées. À l'inverse, les deux espèces de buissons devraient avoir des probabilités, 
-# dans la matrice de transition, de persistance plus élevées puisque l’ensemble des buissons doit représenter 70 % de la végétation à l’équilibre. Finalement les 2 types de 
+# faible que les buissons pour représenter le 30% des parcelles végétalisées. À l'inverse, les deux espèces de buissons devraient avoir des probabilités, 
+# dans la matrice de transition, de persistance plus élevées puisque l’ensemble des buissons doit représenter 70 % de la végétation à l’équilibre. Finalement, les 2 types de 
 # buissons devraient avoir des probabilités dans la matrice de transition relativement semblable pour que l’espèce la moins abondante représente au moins 30 % des parcelles 
 # occupées par des buissons.
 
@@ -51,23 +51,26 @@
 # ceux-ci devront être des buissons plutôt que des herbacés pour respecter les contraintes. 
 # Le modèle déterministe devrait montrer une tendance semblable à celui stochastique, mais sans variabilité aléatoire.
 
-# Alors, les résultats attendues seraient que dans un modèle de Markov, vu que les probabilités de transition restent constantes dans le temps et que le système est fermé, 
+# Alors, les résultats attendus seraient que, dans un modèle de Markov, vu que les probabilités de transition restent constantes dans le temps et que le système est fermé, 
 # la succession écologique devrait mener vers une distribution stable des états des parcelles après un certain nombre de générations respectant les contraintes.
 
 # # Description du modèle
 
-# En utilisant autant de sous-sections que nécessaire, expliquez le modèle, ses
-# suppositions, et les décisions principales
+# ## États possibles
 
 # Le modèle utilisé est un modèle de succession écologique basé sur une chaine de Markov. Chacune des parcelles du corridor peut passer d'un état à un autre d'une génération à 
-# l'autre selon une matrice de transition fixe. Les états possibles sont soient vides (_Barren_) ou végétalisées, l'état végétalisées peut être soit des herbacées (_Grasses_) 
+# l'autre selon une matrice de transition fixe. Les états possibles sont soit vides (_Barren_) ou végétalisés, l'état végétalisé peut être soit des herbacés (_Grasses_) 
 # ou bien deux types de buissons (_Shrubs1_ et _Shrubs2_). 
+
+# ## Corridor et transition d'états
 
 # Le corridor est représenté par 200 parcelles indépendantes qui peuvent se trouver chacune dans un seul état à la fois. Elles peuvent changer d'état à chaque génération selon
 # la matrice de transition, qui décrit les probabilités de succession ou bien de persistance des différents états selon l'état de base.
 
 # Le modèle stipule que le système est fermé, donc aucune autre espèce ne peut coloniser le corridor, que les probabilités de transitions sont constantes dans le temps et ne
 # dépendent pas de la position des parcelles et du voisinage. De plus, les parcelles sont indépendantes une des autres. 
+
+# ## Simulations
 
 # Il y a deux types de simulation, une stochastique et l'autre déterministe. La stochastique inclut une composante aléatoire dans les transitions entre états et la déterministe
 # représente la trajectoire moyenne attendue du système qui elle reste fixe dans le temps. Alors, les probabilités de transition sont constantes et ne dépendent pas de la 
@@ -151,6 +154,7 @@ function check_function_arguments(transitions, states)
     return nothing
 end
 
+# # Vérification de l'état initial
 # ## On crée une fonction afin de vérfier que le nombre de buissons à l'état initial respecte les conditions imposées.
 """
     verif_nombre_buissons_ini(s)
@@ -171,6 +175,7 @@ julia> verif_nombre_buissons_ini(s)
   25
 ```
 """
+
 function verif_nombre_buissons_ini(s)
 
     # Si jamais le nombre de buissons dépasse 50, on va:
@@ -354,12 +359,12 @@ end
     function simulation(transitions, states; generations=500, stochastic=false)
 
 Fonction exécutant la simulation complète. Elle va initialiser les états des parcelles, puis appliquer les vérifications nécessaires et finalement simuler
-l’évolution du corridor sur plusieurs générations. Elle permet donc d’observer comment la composition végétale va changer au fil du temps jusqu’à l'équilibre.
+l'évolution du corridor sur plusieurs générations. Elle permet donc d'observer comment la composition végétale va changer au fil du temps jusqu'à l'équilibre.
 
 transitions : La matrice de transition
 generation : Nombre de générations à simuler (500 par défaut)
 stochastic : Permet de choisir une simulation stochastique (true) ou déterministe (false)
-La fonction retourne la matrice timeseries, qui contient l’évolution du nombre de parcelles dans chaque état au fil du temps.
+La fonction retourne la matrice timeseries, qui contient l'évolution du nombre de parcelles dans chaque état au fil du temps.
 
 """
 function simulation(transitions, states; generations=500, stochastic=false)
@@ -400,8 +405,7 @@ f = Figure()
 ax = Axis(f[1, 1], xlabel="Nb. générations", ylabel="Nb. parcelles")
 # ## Vérification des conditions recherchées lorsqu'on fait des simulations stochastiques et déterministes
 
-# J'obtiens "MethodError: no method matching zeros(::Type{Float64}, ::Vector{Int64}, ::Int64, ::Int64)" quand je met "states" dans "sto", mais length(s) qui correspond
-# a "states" fonctionne...
+
 
 """
     function conditions(transitions, states; gen = 199, iteration = 100, seuil = 0.8)
@@ -418,7 +422,7 @@ generation : Nombre de générations à simuler (199 par défaut)
 iteration : Le nombre de simulations stochastiques qui sont générées
 """
 
-function conditions(transitions, states; gen = 199, iteration = 100)
+function conditions(transitions, states; gen = 199, iteration = 200)
 
     # S'assurer que les conditions initiales sont respectées
 
@@ -497,31 +501,29 @@ current_figure()
 # ## Recherche de la matrice de transition idéale
 
 # Lorsque l'on aménage les 200 parcelles au départ, il faut planter 50 buissons et il ne peut pas y avoir d'herbes. L'aménagement
-# d'un nombre égale des 2 espèces de buissons augmente les chances d'arriver à des populations qui ont une abondance similaire 
+# d'un nombre égal des 2 espèces de buissons augmente les chances d'arriver à des populations qui ont une abondance similaire 
 # lorsqu'à l'équilibre. Afin de trouver la meilleure matrice de transition possible pour répondre aux critères demandés, nous avons
-# commencé en donnait une matrice de transition identique pour les 4 états qui est de 80% de transition à _barren_ afin de respecter 
+# commencé en donnant une matrice de transition identique pour les 4 états qui est de 80% de transition à _barren_ afin de respecter 
 # l'obtention de 20% d'espèces végétales, 6% de transition à _grasses_ pour que 30% des parcelles végétalisées soient de l'herbe
 # et les 14% de transition restant ont été répartis également entre les 2 espèces de _shrubs_ afin de ne pas avoir une sur-représentation
-# d'une des 2 espèces. À partir de cette matrice de départ, des modifications par essais-erreurs ont été effectuées en gardant en
-# tête que les transitions vers l'état _barren_ doit rester élevé, celles ver _grasses_ doivent être faibles et celles vers les 2
+# d'une des 2 espèces. À partir de cette matrice de départ, des modifications automatiques par essais-erreurs ont été effectuées en gardant en
+# tête que les transitions vers l'état _barren_ doivent rester élevé, celles vers _grasses_ doivent être faibles et celles vers les 2
 # états de _shrubs_ doivent être similaires.
 # ## Limitations du modèle
 
-# Les conditions d'équilibres imposées ont été observées avec un intervale de plus ou moins 10% dans la simlution de notre modèle stochastique afin de prendre en compte 
-# l'effet de la stochasticité. Il est nécessaire d'ajouter un intervale, mais malgré celui-ci, seulement 48% des simulations répondent aux conditions demandées. Il serait 
-# possible d'agrandir cet interval afin de pouvoir augmenter ce %, mais nous trouvons que plus de 10% commence à diverger grandement des objetifs fixés.
+# Les conditions d'équilibres imposées ont été observées avec un intervalle de plus ou moins 10% dans la simulation de notre modèle stochastique afin de prendre en compte 
+# l'effet de la stochasticité. Il est nécessaire d'ajouter un intervalle afin que . Avec celui-ci, 83% des simulations stochastiques répondent aux conditions demandées. Il serait 
+# possible d'agrandir cet intervalle afin de pouvoir augmenter encore plus ce pourcentage, mais nous trouvons que plus de 10% commence à diverger grandement des objectifs fixés.
 
-# Les 2 vecteurs de transitions propres aux espèces de buissons, sont quasiment identiques. D'un point de vue, biologique il semble très peu probable d'avoir deux espèces
+# Les 2 vecteurs de transitions propres aux espèces de buissons, sont quasiment identiques. D'un point de vue biologique, il semble très peu probable d'avoir deux espèces
 # différentes qui ont un cycle de succession quasi-identique comme modélisé ici.
 
-# Concluez sur le Résultat
-
 # La matrice de transition met une grande emphase sur le retour à l'état _barren_ pour toutes les espèces végétales. Il serait
-# possible d'interpréter ces résultats comme une pression anthropologique afin de maintenir l'intégriter des lignes électriques
+# possible d'interpréter ces résultats comme une pression anthropologique afin de maintenir l'intégrité des lignes électriques
 # ou la présence de nombre élevé d'herbivores. Si la pression des herbivores n'était pas suffisante, introduire une cinquième 
-# espèce permettrait de réduire l'entretient requis.
+# espèce permettrait de réduire l'entretien requis.
 
 # Comparez ces résultats aux résultats d'un modèle non stochastique.
-
-
-
+# Dans un modèle non stochastique, le résultat obtenu serait déterminé en ne montrant aucune variation. Ceci ne serait pas trop réaliste, puisque de nombreux processus biologiques
+# requièrent de la stochasticité lors de modélisation afin de pouvoir mieux représenter l'élément aléatoire présent dans la réalité. Un modèle déterministe, bien que montrant un 
+# résultat "concret" et inchangeable, ne simule pas trop bien les conditions environnementales en constant changement.

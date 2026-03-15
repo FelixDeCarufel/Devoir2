@@ -205,8 +205,9 @@ function verif_nombre_buissons_ini(s)
 
             # On retourne le nouvel état initial.
 
-            return s
+            
     end
+    return s
 end
 
 # ## On crée une fonction qui vérifie qu'il n'y a pas d'herbes et qu'il n'y a pas plus de 50 buissons à l'état initial.
@@ -362,6 +363,7 @@ Fonction exécutant la simulation complète. Elle va initialiser les états des 
 l'évolution du corridor sur plusieurs générations. Elle permet donc d'observer comment la composition végétale va changer au fil du temps jusqu'à l'équilibre.
 
 transitions : La matrice de transition
+states : vecteur contenant le nombre initial de parcelles dans chaque état
 generation : Nombre de générations à simuler (500 par défaut)
 stochastic : Permet de choisir une simulation stochastique (true) ou déterministe (false)
 La fonction retourne la matrice timeseries, qui contient l'évolution du nombre de parcelles dans chaque état au fil du temps.
@@ -417,7 +419,7 @@ simulations, la fonction retourne une figure de l'évolution des parcelles dans 
 ne sont pas respectées, le score des simulations stochastiques est fourni.
 
 transitions : La matrice de transition
-states : Le nombre d'état possible dans la simulation
+states : vecteur contenant le nombre initial de parcelles dans chaque état
 generation : Nombre de générations à simuler (199 par défaut)
 iteration : Le nombre de simulations stochastiques qui sont générées
 """
@@ -428,8 +430,8 @@ function conditions(transitions, states; gen = 199, iteration = 200)
 
     check_transition_matrix!(transitions)
     check_function_arguments(transitions, states)
-    states = verif_nombre_buissons_ini(s)
-    states = verif_etat_initial(s)
+    states = verif_nombre_buissons_ini(states)
+    states = verif_etat_initial(states)
 
     patches = sum(states)
     # ## Vérifier les conditions avec une simulation stochastique
@@ -443,7 +445,7 @@ function conditions(transitions, states; gen = 199, iteration = 200)
         sto_sim = simulation(transitions, states; stochastic=true, generations=gen)
         sto[:, :, i] = sto_sim
 
-        for j in eachindex(s)
+        for j in eachindex(states)
             lines!(ax, sto_sim[j, :], color=states_colors[j], alpha=0.1)
         end
         
@@ -462,7 +464,7 @@ function conditions(transitions, states; gen = 199, iteration = 200)
     # ## Vérifier les conditions avec une simulation déterministe
 
     det_sim = simulation(transitions, states; stochastic=false, generations=gen+1)
-    for i in eachindex(s)
+    for i in eachindex(states)
         lines!(ax, det_sim[i, :], color=states_colors[i], alpha=1, label=states_names[i], linewidth=4)  # on ne peut pas générer le graph avec les stochastiques seulement, car il faut définir les labels, ce qu'on fait juste avec la déterministe
     end
 
@@ -478,8 +480,8 @@ function conditions(transitions, states; gen = 199, iteration = 200)
         condition_det = false
     end
 
-    return "Une population initiale de $(s[1]) parcelles vides, $(s[2]) parcelles avec de l'herbe, $(s[3]) parcelles occupées par des buissons de l'espèce 1 et $(s[4]) 
-    parcelles occupées par des buissons de l'espèce  avec une matrice de transition de $(T), mène à une population finale de $(final_det[1]) parcelles vides, 
+    return "Une population initiale de $(states[1]) parcelles vides, $(states[2]) parcelles avec de l'herbe, $(states[3]) parcelles occupées par des buissons de l'espèce 1 et $(states[4]) 
+    parcelles occupées par des buissons de l'espèce  avec une matrice de transition de $(transitions), mène à une population finale de $(final_det[1]) parcelles vides, 
     $(final_det[2]) parcelles avec de l'herbe, $(final_det[3]) parcelles avec des buissons de l'espèce 1 et $(final_det[4]) parcelles avec des buissons de l'espèce 2.
     Dans ce scénario, $(condition_sto)% des simulations stochastiques correspondent aux conditions recherchées. Il est $(condition_det) de dire que la simulation 
     déterministe y répond."

@@ -154,8 +154,9 @@ function check_function_arguments(transitions, states)
     return nothing
 end
 
-# # Vérification de l'état initial
-# ## On crée une fonction afin de vérfier que le nombre de buissons à l'état initial respecte les conditions imposées.
+# ## Fonction verif_nombre_buissons_ini
+
+# On crée une fonction afin de vérfier que le nombre de buissons à l'état initial respecte les conditions imposées.
 """
     verif_nombre_buissons_ini(s)
 
@@ -210,7 +211,9 @@ function verif_nombre_buissons_ini(s)
     return s
 end
 
-# ## On crée une fonction qui vérifie qu'il n'y a pas d'herbes et qu'il n'y a pas plus de 50 buissons à l'état initial.
+# ## Fonction verif_etat_initial
+
+# On crée une fonction qui vérifie qu'il n'y a pas d'herbes et qu'il n'y a pas plus de 50 buissons à l'état initial.
 
 """
     verif_etat_initial(s)
@@ -280,13 +283,13 @@ patches = sum(s)
 # ## Fonction _sim_stochastic
 
 # Cette fonction simule le tout de façon stochastique. Pour toutes les parcelles, elle va répartir de façon aléatoire celles-ci vers les états possibles de la génération suivante.
-# Tout cela selon les probabilités de la matrice de transition. Donc, elle représente donc le caractère aléatoire de la succession écologique simuler ici de façon stochastique.
+# Tout cela sera fait selon les probabilités de la matrice de transition. Donc, elle représente le caractère aléatoire de la succession écologique simulée ici de façon stochastique.
 
 """
     function _sim_stochastic!(timeseries, transitions, generation)
 
 Fonction simulant de façon stochastique. Pour toutes les parcelles, elle va répartir de façon aléatoire celles-ci vers les états possibles de la génération suivante.
-Tout cela selon les probabilités de la matrice de transition.
+Tout cela fait selon les probabilités de la matrice de transition.
 
 timeseries : Matrice contenant le nombre de parcelles dans chaque état au fil du temps
 transitions : La matrice de transition
@@ -316,7 +319,7 @@ end
 # l'état de base de celles-ci et la matrice de transition. Donc, à la génération suivante, on va obtenir les états des parcelles en appliquant la matrice de transition. 
 # Elle représente donc une tendance moyenne du système, sans effet du hasard.
 
-# À partir d'ici les commentaires c'est pour nous on les enlèvera à la fin mais ça nous permet de comprendre le tout:
+
 """
     function __sim_determ!(timeseries, transitions, generation)
 
@@ -349,7 +352,7 @@ end
 # Cette fonction va exécuter la simulation complète. Elle va initialiser les états des parcelles, puis appliquer les vérifications nécessaires et finalement simuler
 # l’évolution du corridor sur plusieurs générations. Elle permet donc d’observer comment la composition végétale va changer au fil du temps jusqu’à l'équilibre.
 
-# À partir d'ici les commentaires c'est pour nous on les enlèvera à la fin mais ça nous permet de comprendre le tout:
+
 
 # transitions → la matrice de transition
 # states → le nombre initial de parcelles dans chaque état
@@ -492,15 +495,24 @@ resultat = conditions(T, s)
 println(resultat)
 
 # # Résultat des simulations et discussion
-# ## Présentez les résultats des simulations, en faisant un lien avec la question initiale.
+# ## Présentation des résultats.
+
+# La figure obtenue à  la fin permet d'observer comment le corridor en dessous de la ligne électrique évolue avec le temps. L'on voit comment les 4 états se 
+# stabilisent dans les premières générations afin d'atteindre l'équilibre qui respecte les conditions imposées. L'on voit qu'une majorité des parcelles sont
+# vides et que celles-ci sont suivies par les parcelles abritant les 2 espèces des buissons (shrub1 et shrub2), puis par les parcelles herbacées, qui représentent
+# la minorité des parcelles. L'équilibre est atteint assez abruptement, toutes les parcelles atteignant se remplissant et devenant herbacées ou buissonées dès la 
+# première génération, sans vraiment fluctuer. Ceci est différent dans les simulations stochastiques, qui sont observables avec les lignes pâles derrière les
+# lignes principales. Ces simulations montrent d'important fluctuations dû aux éléments aléatoires les régissant. Malgré ces fluctuations, ces simulations suivent
+# tout de même l'allure des résultats principaux, leurs proportions étant assez similaires. On voit donc que les résultats de la stimulation déterministe répondent
+# aux conditions imposées ce qui est aussi vrai pour la majorité des simulations stochastiques.
 
 axislegend(ax)
 tightlimits!(ax)
 current_figure()
  
-# # Discussion
+# ## Discussion
 
-# ## Recherche de la matrice de transition idéale
+# ### Recherche de la matrice de transition idéale
 
 # Lorsque l'on aménage les 200 parcelles au départ, il faut planter 50 buissons et il ne peut pas y avoir d'herbes. L'aménagement
 # d'un nombre égal des 2 espèces de buissons augmente les chances d'arriver à des populations qui ont une abondance similaire 
@@ -511,7 +523,7 @@ current_figure()
 # d'une des 2 espèces. À partir de cette matrice de départ, des modifications automatiques par essais-erreurs ont été effectuées en gardant en
 # tête que les transitions vers l'état _barren_ doivent rester élevé, celles vers _grasses_ doivent être faibles et celles vers les 2
 # états de _shrubs_ doivent être similaires.
-# ## Limitations du modèle
+# ### Limitations du modèle
 
 # Les conditions d'équilibres imposées ont été observées avec un intervalle de plus ou moins 10% dans la simulation de notre modèle stochastique afin de prendre en compte 
 # l'effet de la stochasticité. Il est nécessaire d'ajouter un intervalle afin que . Avec celui-ci, 83% des simulations stochastiques répondent aux conditions demandées. Il serait 
@@ -525,7 +537,7 @@ current_figure()
 # ou la présence de nombre élevé d'herbivores. Si la pression des herbivores n'était pas suffisante, introduire une cinquième 
 # espèce permettrait de réduire l'entretien requis.
 
-# Comparez ces résultats aux résultats d'un modèle non stochastique.
+# ### Comparaison au modèle non stochastique
 # Dans un modèle non stochastique, le résultat obtenu serait déterminé en ne montrant aucune variation. Ceci ne serait pas trop réaliste, puisque de nombreux processus biologiques
 # requièrent de la stochasticité lors de modélisation afin de pouvoir mieux représenter l'élément aléatoire présent dans la réalité. Un modèle déterministe, bien que montrant un 
 # résultat "concret" et inchangeable, ne simule pas trop bien les conditions environnementales en constant changement.

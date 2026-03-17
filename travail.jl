@@ -531,3 +531,9 @@ current_figure()
 # Dans un modèle non stochastique, le résultat obtenu serait déterminé en ne montrant aucune variation. Ceci ne serait pas trop réaliste, puisque de nombreux processus biologiques
 # requièrent de la stochasticité lors de modélisation afin de pouvoir mieux représenter l'élément aléatoire présent dans la réalité. Un modèle déterministe, bien que montrant un 
 # résultat "concret" et inchangeable, ne simule pas trop bien les conditions environnementales en constant changement.
+
+# # Références
+
+# Trejo-Pérez, R., Chagnon, P.-L., Boivin, P. et Brisson, J. (2024). Resistance against tree encroachment is driven by richness and identity of herbaceous resident species. Applied Vegetation Science, 27(2), e12781. https://doi.org/10.1111/avsc.12781
+
+# Urry, L. A., Cain, M. L. (Michael L., Wasserman, S. A., Minorsky, P. V., Reece, J. B., Campbell, N. A., Campeau-Péloquin, A., Racine, C. (Enseignante) et Dubé, S. (2020). Biologie (5e édition). Pearson ERPI.

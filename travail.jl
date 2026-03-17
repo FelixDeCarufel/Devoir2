@@ -170,16 +170,6 @@ Vérifier le nombre de buissons à l'état initial (s) et voir s'il respecte les
 S'il y a plus de 50 buissons, on les modifie afin qu'ils aient les mêmes proportions, mais avec 50 buissons.
 Dans les cas où les nouvelles proportions engendrent une somme de 49, on rajoute une parcelle chez l'état vide.
 
-# Examples
-```julia-repl
-julia> s = [150,0,35,35]
-julia> verif_nombre_buissons_ini(s) 
-4-element Vector{Int64}:
- 150
-   0
-  25
-  25
-```
 """
 function verif_nombre_buissons_ini(s)
 
@@ -227,17 +217,6 @@ Vérifier l'état initial (s) et voir s'il respecte les conditions imposées par
 S'il y a des parcelles herbacées, elles sont supprimées.
 Si la somme des parcelles n'équivaut pas à 200, les autres valeurs (vides, buisson1 et buisson2) sont modifiées en respectant leurs proportions, mais en étant à 200.
 
-
-# Examples
-```julia-repl
-julia> s = [200,10,35,35]
-julia> verif_etat_initial(s) 
-4-element Vector{Int64}:
- 150
-   0
-  25
-  25
-```
 """
 function verif_etat_initial(s)
 

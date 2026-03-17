@@ -17,6 +17,7 @@
 # ---
 
 # # Introduction
+
 # ## Mise en contexte
 
 # On utilise le concept de succession écologique pour décrire le cycle des espèces présentes sur un territoire suite à une perturbation, qu'elle soit naturelle ou 
@@ -81,6 +82,7 @@
 # vous utilisez pour simuler le modèle. Le texte est aussi important que le code
 # en lui-même, et doit faire des liens entre les choix de programmation et la
 # question biologique.
+
 # ## Packages nécessaires pour la simulation
 
 using CairoMakie
@@ -105,6 +107,7 @@ T[1, :] = [85, 6, 7, 7]
 T[2, :] = [60, 10, 5, 5]
 T[3, :] = [75, 2, 7, 7]
 T[4, :] = [80, 6, 7, 7]
+
 # ## Fonction check_tansition_matrix
 
 # Fonction vérifiant que chaque ligne de la matrice de transition correspond à des probabilités. La somme des probabilités sur la ligne de matrice de transition doient 
@@ -128,6 +131,7 @@ function check_transition_matrix!(T)
     end
     return T
 end
+
 # ## Fonction check_function_arguments
 
 # Cette fonction vérifie que la matrice de transition est bien carrée et que le nombre d’états correspond à la taille de la matrice. Cela permet donc d'éviter des
@@ -157,6 +161,7 @@ end
 # ## Fonction verif_nombre_buissons_ini
 
 # On crée une fonction afin de vérfier que le nombre de buissons à l'état initial respecte les conditions imposées.
+
 """
     verif_nombre_buissons_ini(s)
 
@@ -176,35 +181,34 @@ julia> verif_nombre_buissons_ini(s)
   25
 ```
 """
-
 function verif_nombre_buissons_ini(s)
 
-    # Si jamais le nombre de buissons dépasse 50, on va:
+    ## Si jamais le nombre de buissons dépasse 50, on va:
 
     if (s[3]+s[4]) > 50
 
-            # donner un message d'avertissement
+            ## donner un message d'avertissement
 
             @warn "Il y avait initialement plus que 50 buissons. Les proportions des nombres donnés furent gardées."
 
-            # et stocker les valeurs qui furent données par l'utilisateur.
+            ## et stocker les valeurs qui furent données par l'utilisateur.
 
             ancienne_valeur3= s[3]
             ancienne_valeur4= s[4]
 
-            # Par la suite, on change les valeurs, afin qu'elles respectent les conditions, tout en respectant les proportions qui furent données initialement.
-            # Si jamais les nouvelles valeurs donnent des nombres à virgule, on arrondit au nombre le plus bas, puisqu'un buisson et demi n'est pas quelquechose qui est observable dans la réalité.
+            ## Par la suite, on change les valeurs, afin qu'elles respectent les conditions, tout en respectant les proportions qui furent données initialement.
+            ## Si jamais les nouvelles valeurs donnent des nombres à virgule, on arrondit au nombre le plus bas, puisqu'un buisson et demi n'est pas quelquechose qui est observable dans la réalité.
 
             s[3]= floor(((ancienne_valeur3 * 50) / (ancienne_valeur3+ancienne_valeur4)))
             s[4]= floor(((ancienne_valeur4 * 50) / (ancienne_valeur3+ancienne_valeur4)))
 
-            # Dans le cas où les nouvelles proportions, à cause de l'approximation, donnent 49 au lieu de 50, on rajoute une parcelle vide afin qu'il y ait 200 parcelles en tout.
+            ## Dans le cas où les nouvelles proportions, à cause de l'approximation, donnent 49 au lieu de 50, on rajoute une parcelle vide afin qu'il y ait 200 parcelles en tout.
 
             if (s[3]+s[4]) == 49
                 s[1]= s[1]+1
             end
 
-            # On retourne le nouvel état initial.
+            ## On retourne le nouvel état initial.
 
             
     end
@@ -235,37 +239,36 @@ julia> verif_etat_initial(s)
   25
 ```
 """
-
 function verif_etat_initial(s)
 
-    # Si il y a des parcelles herbacées, on rejette cet état initial.
+    ## Si il y a des parcelles herbacées, on rejette cet état initial.
 
    if s[2] !=0
         @warn"Il ne faut pas qu'il y a d'herbes à l'état initial. Les herbes furent supprimées."
         s[2]=0
     end
 
-    # Si il y a plus ou moins de 200 parcelles, on rejette aussi cet état initial.
+    ## Si il y a plus ou moins de 200 parcelles, on rejette aussi cet état initial.
 
     if sum(s) != 200
 
-        # On donne un message d'avertissement.
+        ## On donne un message d'avertissement.
 
         @warn("Il n'y a pas 200 parcelles.")
 
-        # On stocke les anciennes valeurs,
+        ## On stocke les anciennes valeurs,
 
         ancienne_valeur1=s[1]
         ancienne_valeur3= s[3]
         ancienne_valeur4= s[4]
 
-        # On les arrondit au nombre le plus bas, selon des proportions où leur somme est égale à 200.
+        ## On les arrondit au nombre le plus bas, selon des proportions où leur somme est égale à 200.
 
         s[1]= floor(((ancienne_valeur1 * 200) / (ancienne_valeur3+ancienne_valeur4+ancienne_valeur1)))
         s[3]= floor(((ancienne_valeur3 * 200) / (ancienne_valeur3+ancienne_valeur4+ancienne_valeur1)))
         s[4]= floor(((ancienne_valeur4 * 200) / (ancienne_valeur3+ancienne_valeur4+ancienne_valeur1)))
         
-         # En les arrondissant au nombre le plus bas, il devient possible que la somme des parcelles ne soit pas égale à 200. Si c'est le cas, on rajoute les parcelles manquantes à celles de l'état vide.
+         ## En les arrondissant au nombre le plus bas, il devient possible que la somme des parcelles ne soit pas égale à 200. Si c'est le cas, on rajoute les parcelles manquantes à celles de l'état vide.
         
         if patches == 199
             s[1]=s[1]+1
@@ -280,6 +283,7 @@ end
 
 states = length(s)
 patches = sum(s)
+
 # ## Fonction _sim_stochastic
 
 # Cette fonction simule le tout de façon stochastique. Pour toutes les parcelles, elle va répartir de façon aléatoire celles-ci vers les états possibles de la génération suivante.
@@ -301,18 +305,19 @@ function _sim_stochastic!(timeseries, transitions, generation)
     for state in axes(timeseries, 1)
         pop_change = rand(Multinomial(timeseries[state, generation], transitions[state, :])) 
 
-        # fait un tirage aléatoire pour savoir comment les parcelles de l’état actuel vont se répartir à la génération suivante.
-        # timeseries[state, generation] = combien de parcelles sont dans cet état en ce moment
-        # transitions[state, :] = les probabilités de passer vers chaque état possible
-        # Multinomial(...) = répartit ces parcelles entre les différents états
-        # rand(...) = fait le tirage au hasard
+        ## fait un tirage aléatoire pour savoir comment les parcelles de l’état actuel vont se répartir à la génération suivante.
+        ## timeseries[state, generation] = combien de parcelles sont dans cet état en ce moment
+        ## transitions[state, :] = les probabilités de passer vers chaque état possible
+        ## Multinomial(...) = répartit ces parcelles entre les différents états
+        ## rand(...) = fait le tirage au hasard
 
         timeseries[:, generation+1] .+= pop_change
 
-        # Cette ligne ajoute le résultat du tirage à la génération suivante.
+        ## Cette ligne ajoute le résultat du tirage à la génération suivante.
     
     end
 end
+
 # ## Fonction _sim_determ
 
 # Cette fonction simule le tout de façon déterministe. Elle calcule directement la composition attendue des états des différentes parcelles selon 
@@ -335,15 +340,15 @@ generation : Indice de la génération actuelle dans la matrice.
 function _sim_determ!(timeseries, transitions, generation)
     pop_change = (timeseries[:, generation]' * transitions)'
 
-    # Cette ligne calcule directement combien de parcelles devraient se retrouver dans chaque état à la prochaine génération.
-    # Ici : timeseries[:, generation] = le vecteur des parcelles actuelles
-    # ' = transpose le vecteur pour permettre la multiplication matricielle
-    # * transitions = applique la matrice de transition
-    # le dernier ' remet le résultat en colonne
+    ## Cette ligne calcule directement combien de parcelles devraient se retrouver dans chaque état à la prochaine génération.
+    ## Ici : timeseries[:, generation] = le vecteur des parcelles actuelles
+    ## ' = transpose le vecteur pour permettre la multiplication matricielle
+    ## * transitions = applique la matrice de transition
+    ## le dernier ' remet le résultat en colonne
 
     timeseries[:, generation+1] .= pop_change
     
-    # place directement les valeurs calculées dans la génération suivante.
+    ## place directement les valeurs calculées dans la génération suivante.
 
 end
 
@@ -376,21 +381,21 @@ function simulation(transitions, states; generations=500, stochastic=false)
 
     _data_type = stochastic ? Int64 : Float32
 
-    # Cette ligne choisit le type de données utilisé dans la simulation :
-    # Int64 si la simulation est stochastique
-    # Float32 si elle est déterministe
+    ## Cette ligne choisit le type de données utilisé dans la simulation :
+    ## Int64 si la simulation est stochastique
+    ## Float32 si elle est déterministe
 
     timeseries = zeros(_data_type, length(states), generations + 1)
 
-    # crée une matrice qui va enregistrer l’évolution du nombre de parcelles dans chaque état au fil des générations. lignes → les états et colonnes → les générations.
+    ## crée une matrice qui va enregistrer l’évolution du nombre de parcelles dans chaque état au fil des générations. lignes → les états et colonnes → les générations.
 
     timeseries[:, 1] = states
 
     _sim_function! = stochastic ? _sim_stochastic! : _sim_determ!
 
-    # Cette ligne choisit quelle fonction utiliser pour la simulation :
-    # _sim_stochastic! si on veut une simulation aléatoire
-    # _sim_determ! si on veut une simulation déterministe
+    ## Cette ligne choisit quelle fonction utiliser pour la simulation :
+    ## _sim_stochastic! si on veut une simulation aléatoire
+    ## _sim_determ! si on veut une simulation déterministe
 
     for generation in Base.OneTo(generations) # Répéter pour chaque génération en gros.
         _sim_function!(timeseries, transitions, generation)
@@ -398,7 +403,9 @@ function simulation(transitions, states; generations=500, stochastic=false)
 
     return timeseries # La fonction retourne la matrice timeseries, qui contient l’évolution du nombre de parcelles dans chaque état au fil du temps.
 end
+
 # ## Figure générée
+
 # Les noms des états et leurs couleurs dans le graphique.
 
 states_names = ["Barren", "Grasses", "Shrubs1", "Shrubs2"]
@@ -408,6 +415,7 @@ states_colors = [:grey40, :orange, :teal, :green]
 
 f = Figure()
 ax = Axis(f[1, 1], xlabel="Nb. générations", ylabel="Nb. parcelles")
+
 # ## Vérification des conditions recherchées lorsqu'on fait des simulations stochastiques et déterministes
 
 
@@ -426,10 +434,9 @@ states : vecteur contenant le nombre initial de parcelles dans chaque état
 generation : Nombre de générations à simuler (199 par défaut)
 iteration : Le nombre de simulations stochastiques qui sont générées
 """
-
 function conditions(transitions, states; gen = 199, iteration = 200)
 
-    # S'assurer que les conditions initiales sont respectées
+    ## S'assurer que les conditions initiales sont respectées
 
     check_transition_matrix!(transitions)
     check_function_arguments(transitions, states)
@@ -437,12 +444,13 @@ function conditions(transitions, states; gen = 199, iteration = 200)
     states = verif_etat_initial(states)
 
     patches = sum(states)
-    # ## Vérifier les conditions avec une simulation stochastique
+    
+    ## Vérifier les conditions avec une simulation stochastique
 
     sto = zeros(Float64, length(states), gen+1, iteration)   # "+1" parce que "_sim_stochastic!" utilise generation+1 pour affecter les valeurs des générations dans timeseries
     condition_sto = 0   # Indicateur du nombre de simulations stochastiques qui respectent les conditions
 
-    # Réalisation des simulations stochastiques en vérifiant et notant si chaque itération correspond aux critères
+    ## Réalisation des simulations stochastiques en vérifiant et notant si chaque itération correspond aux critères
 
     for i in 1:iteration
         sto_sim = simulation(transitions, states; stochastic=true, generations=gen)
@@ -452,7 +460,7 @@ function conditions(transitions, states; gen = 199, iteration = 200)
             lines!(ax, sto_sim[j, :], color=states_colors[j], alpha=0.1)
         end
         
-        # Création de différents objets contenant différents états pour faciliter la compréhension des conditions vérifiées à la fin
+        ## Création de différents objets contenant différents états pour faciliter la compréhension des conditions vérifiées à la fin
         
         final_sto = sto[:, gen+1, i]
         veg_sto = sum(final_sto[2:4])
@@ -464,14 +472,14 @@ function conditions(transitions, states; gen = 199, iteration = 200)
         
     end
 
-    # ## Vérifier les conditions avec une simulation déterministe
+    ## Vérifier les conditions avec une simulation déterministe
 
     det_sim = simulation(transitions, states; stochastic=false, generations=gen+1)
     for i in eachindex(states)
-        lines!(ax, det_sim[i, :], color=states_colors[i], alpha=1, label=states_names[i], linewidth=4)  # on ne peut pas générer le graph avec les stochastiques seulement, car il faut définir les labels, ce qu'on fait juste avec la déterministe
+        lines!(ax, det_sim[i, :], color=states_colors[i], alpha=1, label=states_names[i], linewidth=4)  ## on ne peut pas générer le graph avec les stochastiques seulement, car il faut définir les labels, ce qu'on fait juste avec la déterministe
     end
 
-    # Création de différents objets contenant différents états pour faciliter la compréhension des conditions vérifiées à la fin
+    ## Création de différents objets contenant différents états pour faciliter la compréhension des conditions vérifiées à la fin
     
     final_det = det_sim[:, end] 
     veg_det = sum(final_det[2:4])
@@ -495,6 +503,7 @@ resultat = conditions(T, s)
 println(resultat)
 
 # # Résultat des simulations et discussion
+
 # ## Présentation des résultats.
 
 # La figure obtenue à  la fin permet d'observer comment le corridor en dessous de la ligne électrique évolue avec le temps. L'on voit comment les 4 états se 
@@ -523,6 +532,7 @@ current_figure()
 # d'une des 2 espèces. À partir de cette matrice de départ, des modifications automatiques par essais-erreurs ont été effectuées en gardant en
 # tête que les transitions vers l'état _barren_ doivent rester élevé, celles vers _grasses_ doivent être faibles et celles vers les 2
 # états de _shrubs_ doivent être similaires.
+
 # ### Limitations du modèle
 
 # Les conditions d'équilibres imposées ont été observées avec un intervalle de plus ou moins 10% dans la simulation de notre modèle stochastique afin de prendre en compte 
@@ -538,6 +548,7 @@ current_figure()
 # espèce permettrait de réduire l'entretien requis.
 
 # ### Comparaison au modèle non stochastique
+
 # Dans un modèle non stochastique, le résultat obtenu serait déterminé en ne montrant aucune variation. Ceci ne serait pas trop réaliste, puisque de nombreux processus biologiques
 # requièrent de la stochasticité lors de modélisation afin de pouvoir mieux représenter l'élément aléatoire présent dans la réalité. Un modèle déterministe, bien que montrant un 
 # résultat "concret" et inchangeable, ne simule pas trop bien les conditions environnementales en constant changement.

@@ -30,6 +30,7 @@
 # qu'elles ne posent pas de problème aux infrastructures lorsque la communauté végétale atteint l'équilibre. De plus, un nombre minimal d'espèces devrait être considéré
 # afin de négliger les impacts des modifications anthropologiques sur la biodiversité. Trejo-Pérez et ses collègues (2023) ont prouvé qu'une grande sélection d'espèces
 # herbacées avait non seulement un impact positif sur la biodiversité, mais que cela permettait aussi de contrer l'établissement d'arbres plus efficacement.
+
 # ## Question
 
 # Si on devait choisir une espèce d'herbacée et 2 espèces de buissons afin d'aménager un corridor de 200 parcelles sous une ligne à haute tension, lesquelles devraient-on 
@@ -60,7 +61,7 @@
 # ## États possibles
 
 # Le modèle utilisé est un modèle de succession écologique basé sur une chaine de Markov. Chacune des parcelles du corridor peut passer d'un état à un autre d'une génération à 
-# l'autre selon une matrice de transition fixe. Les états possibles sont soit vides (_Barren_) ou végétalisés, l'état végétalisé peut être soit des herbacés (_Grasses_) 
+# l'autre selon une matrice de transition fixe. Les états possibles sont soit vides (_Barren_) ou végétalisés. L'état végétalisé peut être soit des herbacés (_Grasses_) 
 # ou bien deux types de buissons (_Shrubs1_ et _Shrubs2_). 
 
 # ## Corridor et transition d'états
@@ -69,19 +70,15 @@
 # la matrice de transition, qui décrit les probabilités de succession ou bien de persistance des différents états selon l'état de base.
 
 # Le modèle stipule que le système est fermé, donc aucune autre espèce ne peut coloniser le corridor, que les probabilités de transitions sont constantes dans le temps et ne
-# dépendent pas de la position des parcelles et du voisinage. De plus, les parcelles sont indépendantes une des autres. 
+# dépendent pas de la position des parcelles et du voisinage. De plus, les parcelles sont indépendantes les une des autres. 
 
 # ## Simulations
 
 # Il y a deux types de simulation, une stochastique et l'autre déterministe. La stochastique inclut une composante aléatoire dans les transitions entre états et la déterministe
 # représente la trajectoire moyenne attendue du système qui elle reste fixe dans le temps. Alors, les probabilités de transition sont constantes et ne dépendent pas de la 
-# position spatiale des parcelles ainsi que de la composition du voisinage des parcelles. 
-# # Code pour le modèle
+# position spatiale des parcelles ainsi que de la composition du voisinage des parcelles.
 
-# En utilisant autant de sous-sections que nécessaire, expliquez le code que
-# vous utilisez pour simuler le modèle. Le texte est aussi important que le code
-# en lui-même, et doit faire des liens entre les choix de programmation et la
-# question biologique.
+# # Code pour le modèle
 
 # ## Packages nécessaires pour la simulation
 
@@ -116,7 +113,7 @@ T[4, :] = [80, 6, 7, 7]
 """ 
     function check_tansition_matrix!(T)
 
-Fonction vérifiant que chaque ligne de la matrice de transition correspond à des probabilités. La somme des probabilités sur la ligne de matrice de transition doient 
+Fonction vérifiant que chaque ligne de la matrice de transition correspond à des probabilités. La somme des probabilités sur la ligne de matrice de transition doit 
 être égale à 1, si ce n'est pas le cas, la fonction normalise automatiquement les valeurs.
 
 T : La matrice de transition
@@ -336,12 +333,10 @@ end
 # Cette fonction va exécuter la simulation complète. Elle va initialiser les états des parcelles, puis appliquer les vérifications nécessaires et finalement simuler
 # l’évolution du corridor sur plusieurs générations. Elle permet donc d’observer comment la composition végétale va changer au fil du temps jusqu’à l'équilibre.
 
-
-
-# transitions → la matrice de transition
-# states → le nombre initial de parcelles dans chaque état
-# generations → le nombre de générations à simuler (500 par défaut)
-# stochastic → permet de choisir une simulation stochastique ou déterministe
+# transitions : la matrice de transition
+# states : le nombre initial de parcelles dans chaque état
+# generations : le nombre de générations à simuler (500 par défaut)
+# stochastic : permet de choisir une simulation stochastique ou déterministe
 
 """
     function simulation(transitions, states; generations=500, stochastic=false)
@@ -485,7 +480,7 @@ println(resultat)
 
 # ## Présentation des résultats.
 
-# La figure obtenue à  la fin permet d'observer comment le corridor en dessous de la ligne électrique évolue avec le temps. L'on voit comment les 4 états se 
+# La figure obtenue à  la fin permet d'observer comment le corridor en dessous de la ligne électrique évolue avec le temps. On voit comment les 4 états se 
 # stabilisent dans les premières générations afin d'atteindre l'équilibre qui respecte les conditions imposées. L'on voit qu'une majorité des parcelles sont
 # vides et que celles-ci sont suivies par les parcelles abritant les 2 espèces des buissons (shrub1 et shrub2), puis par les parcelles herbacées, qui représentent
 # la minorité des parcelles. L'équilibre est atteint assez abruptement, toutes les parcelles atteignant se remplissant et devenant herbacées ou buissonées dès la 
@@ -515,7 +510,7 @@ current_figure()
 # ### Limitations du modèle
 
 # Les conditions d'équilibres imposées ont été observées avec un intervalle de plus ou moins 10% dans la simulation de notre modèle stochastique afin de prendre en compte 
-# l'effet de la stochasticité. Il est nécessaire d'ajouter un intervalle afin que . Avec celui-ci, 83% des simulations stochastiques répondent aux conditions demandées. Il serait 
+# l'effet de la stochasticité. Il est nécessaire d'ajouter un intervalle afin que, avec celui-ci, 83% des simulations stochastiques répondent aux conditions demandées. Il serait 
 # possible d'agrandir cet intervalle afin de pouvoir augmenter encore plus ce pourcentage, mais nous trouvons que plus de 10% commence à diverger grandement des objectifs fixés.
 
 # Les 2 vecteurs de transitions propres aux espèces de buissons, sont quasiment identiques. D'un point de vue biologique, il semble très peu probable d'avoir deux espèces
